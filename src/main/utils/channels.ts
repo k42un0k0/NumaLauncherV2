@@ -1,0 +1,8 @@
+export enum MainChannel {
+  OPEN_MSA_LOGIN_WINDOW = "OPEN_MSA_LOGIN_WINDOW",
+}
+
+export enum RendererChannel {
+  CLOSE_MSA_LOGIN_WINDOW = "CLOSE_MSA_LOGIN_WINDOW",
+  FETCH_MS_ACCOUNT = "FETCH_MS_ACCOUNT",
+}

@@ -1,11 +1,23 @@
-import { app } from "electron";
+import { app, ipcMain } from "electron";
 import { mainWindowBuilder } from "./window";
+import { config } from "dotenv";
+import { MainChannel } from "./utils/channels";
+import { openMSALoginWindow } from "./msaLoginWindow";
+config();
 
-app.whenReady().then(() => {
-  const mainWindow = mainWindowBuilder({});
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+}
 
-  mainWindow.loadFile("build/index.html");
-  // mainWindow.webContents.openDevTools({ mode: 'detach' });
-});
+function main() {
+  app.whenReady().then(() => {
+    const mainWindow = mainWindowBuilder({});
 
-app.once("window-all-closed", () => app.quit());
+    mainWindow.loadFile("build/index.html");
+  });
+
+  app.once("window-all-closed", () => app.quit());
+  ipcMain.handle(MainChannel.OPEN_MSA_LOGIN_WINDOW, openMSALoginWindow);
+}
+
+main();
