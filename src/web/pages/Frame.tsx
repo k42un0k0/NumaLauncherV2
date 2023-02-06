@@ -33,6 +33,8 @@ export default function Frame() {
 
 const styles = {
   root: css`
+    position: relative;
+    z-index: 9999;
     background-color: rgba(0, 0, 0, 0.85);
     transition: background-color 1s ease;
     -webkit-user-select: none;
@@ -42,8 +44,8 @@ const styles = {
     -webkit-app-region: no-drag;
   `,
   buttonDarwin: css`
-    height: 13px;
-    width: 13px;
+    height: 12px;
+    width: 12px;
     border-radius: 50%;
     border: 0px;
     margin-left: 8px;

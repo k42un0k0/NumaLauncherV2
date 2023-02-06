@@ -5,6 +5,7 @@ type Props = {
   children: ReactNode;
 } & Omit<ComponentProps<typeof Transition>, "children">;
 export default function Fade({ children, ...props }: Props) {
+  console.log(props);
   const ref = useRef(null);
   const transitionProperties = {
     entered: { opacity: 1 },
@@ -19,6 +20,7 @@ export default function Fade({ children, ...props }: Props) {
         return (
           <div
             ref={ref}
+            className={props.className}
             style={{
               transition: "1000ms",
               opacity: 0,

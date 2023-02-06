@@ -13,7 +13,7 @@ export default function Account() {
     setSelectedUUID(mainPreload.config.getSelectedUUID());
   }, []);
   return (
-    <div>
+    <div style={{ height: 1000, flex: 1 }}>
       <div>アカウント設定</div>
       <div>新しいアカウントを追加、または使用するアカウントを管理します</div>
       <div>
@@ -21,9 +21,7 @@ export default function Account() {
       </div>
       <div>
         <div>現在のアカウント</div>
-        {!selectedUUID || (
-          <AccountList acounts={accounts} selectedUUID={selectedUUID} />
-        )}
+        {!selectedUUID || <AccountList acounts={accounts} selectedUUID={selectedUUID} />}
       </div>
     </div>
   );

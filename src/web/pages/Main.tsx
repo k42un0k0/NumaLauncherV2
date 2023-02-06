@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { SwitchTransition } from "react-transition-group";
 import Fade from "../components/Fade";
 import { mainPreload } from "../utils/preload";
 import { useAtom } from "jotai";
 import { pageJotai, PageJotai } from "./pageJotai";
-import Home from "./Home";
+import Landing from "./Landing";
 import Login from "./Login";
 import Setting from "./Setting";
 import Frame from "./Frame";
@@ -12,8 +12,7 @@ import { css } from "@emotion/react";
 import { backgroundImages } from "../../assets/ts/web";
 
 export const Main = () => {
-  const [page, setPage] = useAtom(pageJotai);
-  const [count, setCount] = useState(0);
+  const [page] = useAtom(pageJotai);
   useEffect(() => {
     const removeEventListeners: (() => void)[] = [];
     removeEventListeners.push(
@@ -33,25 +32,11 @@ export const Main = () => {
 
   return (
     <div css={[styles.root]}>
-      <div>
+      <div css={styles.container}>
         <Frame />
-
-        <h1>{count}</h1>
-        <button onClick={() => setCount((count) => count + 1)}>Count</button>
-        <button
-          onClick={() =>
-            mainPreload.login.openMSALoginWindow().then((state) => {
-              console.log(state);
-            })
-          }
-        >
-          aaa
-        </button>
-
-        <button onClick={() => setPage("home")}>home</button>
-        <button onClick={() => setPage("login")}>login</button>
-        <button onClick={() => setPage("setting")}>setting</button>
-        <SwitchTransition>{mainComp(page)}</SwitchTransition>
+        <div css={styles.main}>
+          <SwitchTransition>{mainComp(page)}</SwitchTransition>
+        </div>
       </div>
     </div>
   );
@@ -61,7 +46,7 @@ function mainComp(page: PageJotai) {
     case "home":
       return (
         <Fade key="home">
-          <Home />
+          <Landing />
         </Fade>
       );
     case "login":
@@ -86,5 +71,12 @@ const styles = {
     background-size: cover;
     background-image: url(${backgroundImages[Math.floor(Math.random() * backgroundImages.length)]});
     height: 100vh;
+  `,
+  container: css`
+    height: 100%;
+  `,
+  main: css`
+    height: calc(100% - 24px);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.65) 100%);
   `,
 };
