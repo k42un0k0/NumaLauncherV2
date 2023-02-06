@@ -1,4 +1,4 @@
-import { app, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import { mainWindowBuilder } from "./window";
 import { config } from "dotenv";
 import { MainChannel } from "./utils/channels";
@@ -40,6 +40,22 @@ function main() {
   });
   ipcMain.on(MainChannel.RUN_MINECRAFT, function (event) {
     return runMinecraft(event);
+  });
+  ipcMain.on(MainChannel.CLOSE_WINDOW, function (event) {
+    BrowserWindow.getFocusedWindow()?.close();
+  });
+  ipcMain.on(MainChannel.MINIMIZE_WINDOW, function (event) {
+    const win = BrowserWindow.getFocusedWindow();
+    win?.minimize();
+    event.sender;
+  });
+  ipcMain.on(MainChannel.MAXIMIZE_WINDOW, function (event) {
+    const win = BrowserWindow.getFocusedWindow();
+    if (win?.isMaximized()) {
+      win?.unmaximize();
+      return;
+    }
+    win?.maximize();
   });
 }
 

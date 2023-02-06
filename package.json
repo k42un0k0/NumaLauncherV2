@@ -28,6 +28,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.5",
     "adm-zip": "^0.5.10",
     "axios": "^1.2.6",
     "dotenv": "^16.0.3",

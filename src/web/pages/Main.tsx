@@ -7,6 +7,9 @@ import { pageJotai, PageJotai } from "./pageJotai";
 import Home from "./Home";
 import Login from "./Login";
 import Setting from "./Setting";
+import Frame from "./Frame";
+import { css } from "@emotion/react";
+import { backgroundImages } from "../../assets/ts/web";
 
 export const Main = () => {
   const [page, setPage] = useAtom(pageJotai);
@@ -29,23 +32,27 @@ export const Main = () => {
   });
 
   return (
-    <div className="container">
-      <h1>{count}</h1>
-      <button onClick={() => setCount((count) => count + 1)}>Count</button>
-      <button
-        onClick={() =>
-          mainPreload.login.openMSALoginWindow().then((state) => {
-            console.log(state);
-          })
-        }
-      >
-        aaa
-      </button>
+    <div css={[styles.root]}>
+      <div>
+        <Frame />
 
-      <button onClick={() => setPage("home")}>home</button>
-      <button onClick={() => setPage("login")}>login</button>
-      <button onClick={() => setPage("setting")}>setting</button>
-      <SwitchTransition>{mainComp(page)}</SwitchTransition>
+        <h1>{count}</h1>
+        <button onClick={() => setCount((count) => count + 1)}>Count</button>
+        <button
+          onClick={() =>
+            mainPreload.login.openMSALoginWindow().then((state) => {
+              console.log(state);
+            })
+          }
+        >
+          aaa
+        </button>
+
+        <button onClick={() => setPage("home")}>home</button>
+        <button onClick={() => setPage("login")}>login</button>
+        <button onClick={() => setPage("setting")}>setting</button>
+        <SwitchTransition>{mainComp(page)}</SwitchTransition>
+      </div>
     </div>
   );
 };
@@ -73,3 +80,11 @@ function mainComp(page: PageJotai) {
       return <div key="never"></div>;
   }
 }
+
+const styles = {
+  root: css`
+    background-size: cover;
+    background-image: url(${backgroundImages[Math.floor(Math.random() * backgroundImages.length)]});
+    height: 100vh;
+  `,
+};

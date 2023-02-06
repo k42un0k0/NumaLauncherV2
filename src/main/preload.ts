@@ -4,22 +4,25 @@ import { AuthAccount } from "./msAccountManager";
 import { MainChannel, RendererChannel } from "./utils/channels";
 
 const preload: MainPreload = {
+  window: {
+    close() {
+      ipcRenderer.send(MainChannel.CLOSE_WINDOW);
+    },
+    minimize() {
+      ipcRenderer.send(MainChannel.MINIMIZE_WINDOW);
+    },
+    maximize() {
+      ipcRenderer.send(MainChannel.MAXIMIZE_WINDOW);
+    },
+  },
   login: {
-    openMSALoginWindow: () =>
-      ipcRenderer.invoke(MainChannel.OPEN_MSA_LOGIN_WINDOW),
+    openMSALoginWindow: () => ipcRenderer.invoke(MainChannel.OPEN_MSA_LOGIN_WINDOW),
     onCloseMSALoginWindow: (callback) => {
-      ipcRenderer.on(
-        RendererChannel.CLOSE_MSA_LOGIN_WINDOW,
-        (_, state: CloseMsaLoginWindowState) => callback(state)
-      );
-      return () =>
-        ipcRenderer.off(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, callback);
+      ipcRenderer.on(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, (_, state: CloseMsaLoginWindowState) => callback(state));
+      return () => ipcRenderer.off(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, callback);
     },
     onFetchMSAccount: (callback) => {
-      ipcRenderer.on(
-        RendererChannel.FETCH_MS_ACCOUNT,
-        (_, account: AuthAccount) => callback(account)
-      );
+      ipcRenderer.on(RendererChannel.FETCH_MS_ACCOUNT, (_, account: AuthAccount) => callback(account));
       return () => ipcRenderer.off(RendererChannel.FETCH_MS_ACCOUNT, callback);
     },
   },
@@ -30,15 +33,10 @@ const preload: MainPreload = {
   home: {
     runMinecraft(cb) {
       ipcRenderer.send(MainChannel.RUN_MINECRAFT);
-      const callback = (
-        _: Electron.IpcRendererEvent,
-        event: string,
-        ...args: any[]
-      ) => {
+      const callback = (_: Electron.IpcRendererEvent, event: string, ...args: any[]) => {
         // @ts-expect-error aaaadfa
         cb(event, ...args);
-        if (event == "finish")
-          ipcRenderer.off(RendererChannel.RUN_MINECRAFT_EMITTER, callback);
+        if (event == "finish") ipcRenderer.off(RendererChannel.RUN_MINECRAFT_EMITTER, callback);
       };
       ipcRenderer.on(RendererChannel.RUN_MINECRAFT_EMITTER, callback);
     },
