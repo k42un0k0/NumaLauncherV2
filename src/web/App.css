@@ -1,4 +1,5 @@
 .container {
+  background-image: url("../assets/images/backgrounds/1.jpg");
   text-align: center;
   font-family: sans-serif;
 }

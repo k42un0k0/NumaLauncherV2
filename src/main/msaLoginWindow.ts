@@ -1,9 +1,9 @@
 import { BrowserWindow, ipcMain, ipcRenderer } from "electron";
+import { ConfigManager } from "./config/configManager";
 import { fetchMSAccount } from "./msAccountManager";
 import { RendererChannel } from "./utils/channels";
 
-const redirectUriPrefix =
-  "https://login.microsoftonline.com/common/oauth2/nativeclient?";
+const redirectUriPrefix = "https://login.microsoftonline.com/common/oauth2/nativeclient?";
 
 class MSAWindowManager {
   private static instance?: MSAWindowManager;
@@ -43,11 +43,7 @@ class MSAWindowManager {
 }
 
 function redirectUriToQuery(uri: string): Map<string, string> {
-  const querys = uri
-    .substring(redirectUriPrefix.length)
-    .split("#", 1)
-    .toString()
-    .split("&");
+  const querys = uri.substring(redirectUriPrefix.length).split("#", 1).toString().split("&");
   const queryMap = new Map();
 
   querys.forEach((query) => {
@@ -68,10 +64,7 @@ export async function openMSALoginWindow(event: Electron.IpcMainInvokeEvent) {
   );
 
   win.on("closed", () => {
-    event.sender.send(
-      RendererChannel.CLOSE_MSA_LOGIN_WINDOW,
-      windowManager.closeMSALoginWindowState()
-    );
+    event.sender.send(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, windowManager.closeMSALoginWindowState());
     windowManager.clear();
   });
 
@@ -85,8 +78,10 @@ export async function openMSALoginWindow(event: Electron.IpcMainInvokeEvent) {
       }
       windowManager.successLogin();
 
+      console.log("a");
       win.close();
       const authAcount = await fetchMSAccount(authCode);
+      ConfigManager.INSTANCE.createAccount(authAcount);
       event.sender.send(RendererChannel.FETCH_MS_ACCOUNT, authAcount);
     }
   });

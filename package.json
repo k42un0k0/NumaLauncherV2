@@ -7,7 +7,7 @@
   "main": "build/main.js",
   "scripts": {
     "dev": "run-p dev:*",
-    "build": "cross-env NODE_ENV=\"production\" webpack --progress && electron-builder",
+    "build": "cross-env NODE_ENV=\"production\" webpack --progress && node ./build.js",
     "predev": "rimraf build",
     "prepare": "husky install",
     "dev:webpack": "cross-env NODE_ENV=\"development\" webpack --progress",
@@ -28,6 +28,7 @@
     "node": "19.x.x"
   },
   "dependencies": {
+    "adm-zip": "^0.5.10",
     "axios": "^1.2.6",
     "dotenv": "^16.0.3",
     "jotai": "^1.13.1",
@@ -38,6 +39,8 @@
     "skinview3d": "^3.0.0-alpha.1"
   },
   "devDependencies": {
+    "@jest/globals": "^29.4.1",
+    "@types/adm-zip": "^0.5.0",
     "@types/node": "^18.11.18",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
@@ -54,11 +57,14 @@
     "eslint-plugin-react": "^7.32.1",
     "html-webpack-plugin": "^5.5.0",
     "husky": "^8.0.3",
+    "jest": "^29.4.1",
     "lint-staged": "^13.1.0",
+    "memfs": "^3.4.13",
     "mini-css-extract-plugin": "^2.6.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.8.3",
     "rimraf": "^4.1.2",
+    "ts-jest": "^29.0.5",
     "ts-loader": "^9.4.1",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.4",

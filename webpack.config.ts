@@ -28,7 +28,7 @@ const common: Configuration = {
         use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
-        test: /\.(ico|png|svg|eot|woff?2?)$/,
+        test: /\.(ico|png|svg|eot|woff?2?|jpg)$/,
         type: "asset/resource",
       },
     ],
@@ -53,10 +53,7 @@ const renderer: Configuration = {
   ...common,
   target: "web",
   entry: { app: "./src/web/index.tsx" },
-  plugins: [
-    new MiniCssExtractPlugin(),
-    new HtmlWebpackPlugin({ template: "./src/web/index.html" }),
-  ],
+  plugins: [new MiniCssExtractPlugin(), new HtmlWebpackPlugin({ template: "./src/web/index.html" })],
 };
 
 export default [main, preload, renderer];

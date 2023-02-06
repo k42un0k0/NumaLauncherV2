@@ -23,5 +23,25 @@ const preload: MainPreload = {
       return () => ipcRenderer.off(RendererChannel.FETCH_MS_ACCOUNT, callback);
     },
   },
+  config: {
+    getSelectedUUID: () => ipcRenderer.invoke(MainChannel.GET_SELECTED_ACCOUNT),
+    getAccounts: () => ipcRenderer.invoke(MainChannel.GET_ACCOUNTS),
+  },
+  home: {
+    runMinecraft(cb) {
+      ipcRenderer.send(MainChannel.RUN_MINECRAFT);
+      const callback = (
+        _: Electron.IpcRendererEvent,
+        event: string,
+        ...args: any[]
+      ) => {
+        // @ts-expect-error aaaadfa
+        cb(event, ...args);
+        if (event == "finish")
+          ipcRenderer.off(RendererChannel.RUN_MINECRAFT_EMITTER, callback);
+      };
+      ipcRenderer.on(RendererChannel.RUN_MINECRAFT_EMITTER, callback);
+    },
+  },
 };
 contextBridge.exposeInMainWorld("main", preload);

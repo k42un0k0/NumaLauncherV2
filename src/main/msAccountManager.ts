@@ -1,4 +1,5 @@
-import * as Microsoft from "./microsoft";
+import * as Microsoft from "./api/microsoft";
+import * as Mojang from "./api/mojang";
 export interface AuthAccount {
   accessToken: string;
   username: string;
@@ -18,7 +19,7 @@ export async function fetchMSAccount(authCode: string): Promise<AuthAccount> {
   const MCAccessToken = await Microsoft.authMinecraft(
     MSAccessToken.accessToken
   );
-  const minecraftBuyed = await Microsoft.checkMCStore(
+  const minecraftBuyed = await Microsoft.checkMSStore(
     MCAccessToken.accessToken
   );
   if (!minecraftBuyed)
@@ -26,7 +27,7 @@ export async function fetchMSAccount(authCode: string): Promise<AuthAccount> {
       message:
         "You didn't buy Minecraft! Please use another Microsoft account or buy Minecraft.",
     };
-  const MCProfile = await Microsoft.getMCProfile(MCAccessToken.accessToken);
+  const MCProfile = await Mojang.getMCProfile(MCAccessToken.accessToken);
   return JSON.parse(
     JSON.stringify({
       accessToken: MCAccessToken.accessToken,
