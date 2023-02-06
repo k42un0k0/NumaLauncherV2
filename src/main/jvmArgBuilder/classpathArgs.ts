@@ -1,10 +1,10 @@
 import path from "path";
 import { ConfigManager } from "../config/configManager";
-import { ForgeData112 } from "../forgeData112";
-import { ForgeData113 } from "../forgeData113";
+import { ForgeData112 } from "../versionManifest/forgeData112";
+import { ForgeData113 } from "../versionManifest/forgeData113";
 import { mcVersionAtLeast, mojangFriendlyOS } from "../utils/util";
-import { VersionData112 } from "../versionData112";
-import { VersionData113 } from "../versionData113";
+import { VersionData112 } from "../versionManifest/versionData112";
+import { VersionData113 } from "../versionManifest/versionData113";
 import fs from "fs-extra";
 import { validateRules } from "./helper";
 import AdmZip from "adm-zip";

@@ -1,11 +1,11 @@
 import path from "path";
 import { ConfigManager } from "../config/configManager";
 import { Server } from "../distribution/classes";
-import { ForgeData112 } from "../forgeData112";
+import { ForgeData112 } from "../versionManifest/forgeData112";
 import { AuthAccount } from "../msAccountManager";
 import { _lteMinorVersion } from "../utils/util";
-import { VersionData112 } from "../versionData112";
-import { VersionData113 } from "../versionData113";
+import { VersionData112 } from "../versionManifest/versionData112";
+import { VersionData113 } from "../versionManifest/versionData113";
 import { replaceJVMArgument, _processAutoConnectArg } from "./helper";
 
 export class ArgBuilder112 {

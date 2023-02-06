@@ -2,8 +2,8 @@ import path from "path";
 import { ConfigManager } from "../config/configManager";
 import os from "os";
 import { DistroManager } from "../distribution/distroManager";
-import { ForgeData112 } from "../forgeData112";
-import { ForgeData113 } from "../forgeData113";
+import { ForgeData112 } from "../versionManifest/forgeData112";
+import { ForgeData113 } from "../versionManifest/forgeData113";
 export function mojangFriendlyOS() {
   if (isMac) {
     return "osx";

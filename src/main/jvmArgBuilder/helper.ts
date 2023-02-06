@@ -3,7 +3,7 @@ import { ModSetting } from "../config/modSetting";
 import { Module, Server } from "../distribution/classes";
 import { Types } from "../distribution/constatnts";
 import { mojangFriendlyOS } from "../utils/util";
-import { VersionData113 } from "../versionData113";
+import { VersionData113 } from "../versionManifest/versionData113";
 
 export const classpathSeparator = process.platform === "win32" ? ";" : ":";
 

@@ -2,10 +2,10 @@ import os from "os";
 import path from "path";
 import { ConfigManager } from "../config/configManager";
 import { Server } from "../distribution/classes";
-import { ForgeData113 } from "../forgeData113";
+import { ForgeData113 } from "../versionManifest/forgeData113";
 import { AuthAccount } from "../msAccountManager";
 import { mojangFriendlyOS } from "../utils/util";
-import { VersionData113, VersionData113Rules, VersionDataArg } from "../versionData113";
+import { VersionData113, VersionData113Rules, VersionDataArg } from "../versionManifest/versionData113";
 import { argDiscovery, classpathSeparator, replaceJVMArgument, _processAutoConnectArg } from "./helper";
 
 export class ArgBuilder113 {

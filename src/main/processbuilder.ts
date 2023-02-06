@@ -7,16 +7,16 @@ import path from "path";
 import { ConfigManager } from "./config/configManager";
 import { Module, Server } from "./distribution/classes";
 import { Types } from "./distribution/constatnts";
-import { ForgeData112 } from "./forgeData112";
-import { ForgeData113 } from "./forgeData113";
+import { ForgeData112 } from "./versionManifest/forgeData112";
+import { ForgeData113 } from "./versionManifest/forgeData113";
 import { ArgBuilder112 } from "./jvmArgBuilder/argBuilder112";
 import { ArgBuilder113 } from "./jvmArgBuilder/argBuilder113";
 import { classpathArg } from "./jvmArgBuilder/classpathArgs";
 import { classpathSeparator, resolveModConfiguration } from "./jvmArgBuilder/helper";
 import { AuthAccount } from "./msAccountManager";
 import { getJDKPath, mcVersionAtLeast, _lteMinorVersion } from "./utils/util";
-import { VersionData112 } from "./versionData112";
-import { VersionData113 } from "./versionData113";
+import { VersionData112 } from "./versionManifest/versionData112";
+import { VersionData113 } from "./versionManifest/versionData113";
 
 export class ProcessBuilder {
   gameDir: string;
