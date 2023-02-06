@@ -63,12 +63,12 @@ const styles = {
   `,
   minimizeDarwin: css`
     background-color: #fed045;
-    hover,
-    focus {
+    :hover,
+    :focus {
       background-color: #ffe9a9;
     }
 
-    active {
+    :active {
       background-color: #ffde7b;
     }
   `,
