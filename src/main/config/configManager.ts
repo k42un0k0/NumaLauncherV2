@@ -1,4 +1,4 @@
-import { AuthAccount } from "../msAccountManager";
+import { AuthAccount } from "./msAccount";
 import fs from "fs-extra";
 import { paths } from "../utils/paths";
 import { Config, configArgs, ConfigJSON } from "./config";
@@ -46,6 +46,7 @@ export class ConfigManager {
 
   load() {
     if (!fs.existsSync(paths.launcher.configFile)) {
+      console.log("hello");
       // Create all parent directories.
       fs.ensureDirSync(paths.launcher.$path);
       this.config = Config.default();
@@ -56,6 +57,7 @@ export class ConfigManager {
     try {
       config = JSON.parse(fs.readFileSync(paths.launcher.configFile, "utf-8"));
     } catch (err) {
+      console.log(err);
       fs.ensureDirSync(paths.launcher.$path);
       this.config = Config.default();
       this.save();
@@ -67,7 +69,6 @@ export class ConfigManager {
       args: configArgs,
     };
     this.config = mergeNonNullishValue(Config.default(), plainToClass(def, config));
-
     this.save();
   }
 }

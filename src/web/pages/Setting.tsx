@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import { useAtom } from "jotai";
 import { SwitchTransition } from "react-transition-group";
-import Fade from "../components/Fade";
+import Fade from "./components/Fade";
 import About from "./Setting/About";
 import Account from "./Setting/Account";
 import Java from "./Setting/Java";

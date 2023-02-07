@@ -1,45 +1,35 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { CloseMsaLoginWindowState, MainPreload } from "../common/preload";
-import { AuthAccount } from "./msAccountManager";
+import { MainPreload } from "../common/preload";
+import { CloseMsaLoginWindowState } from "../common/types";
 import { MainChannel, RendererChannel } from "./utils/channels";
 
 const preload: MainPreload = {
   window: {
     close() {
-      ipcRenderer.send(MainChannel.CLOSE_WINDOW);
+      ipcRenderer.send(MainChannel.window.CLOSE);
     },
     minimize() {
-      ipcRenderer.send(MainChannel.MINIMIZE_WINDOW);
+      ipcRenderer.send(MainChannel.window.MINIMIZE);
     },
     maximize() {
-      ipcRenderer.send(MainChannel.MAXIMIZE_WINDOW);
+      ipcRenderer.send(MainChannel.window.MAXIMIZE);
     },
   },
-  login: {
-    openMSALoginWindow: () => ipcRenderer.invoke(MainChannel.OPEN_MSA_LOGIN_WINDOW),
-    onCloseMSALoginWindow: (callback) => {
-      ipcRenderer.on(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, (_, state: CloseMsaLoginWindowState) => callback(state));
-      return () => ipcRenderer.off(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, callback);
-    },
-    onFetchMSAccount: (callback) => {
-      ipcRenderer.on(RendererChannel.FETCH_MS_ACCOUNT, (_, account: AuthAccount) => callback(account));
-      return () => ipcRenderer.off(RendererChannel.FETCH_MS_ACCOUNT, callback);
-    },
+  state: {
+    getState: () => ipcRenderer.invoke(MainChannel.state.GET_STATE),
+    dispatch: (action) => ipcRenderer.invoke(MainChannel.state.GET_STATE, action),
+  },
+  openMSALoginWindow: () => ipcRenderer.invoke(MainChannel.OPEN_MSA_LOGIN_WINDOW),
+  onCloseMSALoginWindow: (callback) => {
+    ipcRenderer.on(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, (_, state: CloseMsaLoginWindowState) => callback(state));
+    return () => ipcRenderer.off(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, callback);
   },
   config: {
-    getSelectedUUID: () => ipcRenderer.invoke(MainChannel.GET_SELECTED_ACCOUNT),
-    getAccounts: () => ipcRenderer.invoke(MainChannel.GET_ACCOUNTS),
+    load: () => ipcRenderer.invoke(MainChannel.config.LOAD),
   },
-  home: {
-    runMinecraft(cb) {
-      ipcRenderer.send(MainChannel.RUN_MINECRAFT);
-      const callback = (_: Electron.IpcRendererEvent, event: string, ...args: any[]) => {
-        // @ts-expect-error aaaadfa
-        cb(event, ...args);
-        if (event == "finish") ipcRenderer.off(RendererChannel.RUN_MINECRAFT_EMITTER, callback);
-      };
-      ipcRenderer.on(RendererChannel.RUN_MINECRAFT_EMITTER, callback);
-    },
+  distribution: {
+    load: () => ipcRenderer.invoke(MainChannel.distribution.LOAD),
   },
+  runMinecraft: () => ipcRenderer.invoke(MainChannel.RUN_MINECRAFT),
 };
 contextBridge.exposeInMainWorld("main", preload);

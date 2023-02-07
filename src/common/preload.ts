@@ -1,7 +1,5 @@
-import { AuthAccount } from "../main/msAccountManager";
-
-export type OpenMsaLoginWindowState = "success" | "already";
-export type CloseMsaLoginWindowState = "success" | "failure";
+import { Action } from "./actions";
+import { CloseMsaLoginWindowState, OpenMsaLoginWindowState, ViewState } from "./types";
 
 export type MainPreload = {
   window: {
@@ -9,16 +7,17 @@ export type MainPreload = {
     minimize: () => void;
     maximize: () => void;
   };
-  login: {
-    openMSALoginWindow: () => Promise<OpenMsaLoginWindowState>;
-    onCloseMSALoginWindow: (callback: (state: CloseMsaLoginWindowState) => void) => () => void;
-    onFetchMSAccount: (callback: (state: AuthAccount) => void) => () => void;
+  state: {
+    getState(): Promise<ViewState>;
+    dispatch(action: Action<unknown>): Promise<void>;
   };
   config: {
-    getSelectedUUID: () => Promise<string>;
-    getAccounts: () => Promise<Record<string, AuthAccount>>;
+    load: () => Promise<void>;
   };
-  home: {
-    runMinecraft(cb: (...args: ["progress", { progress: number; totalSize: number }]) => void): void;
+  distribution: {
+    load: () => Promise<void>;
   };
+  runMinecraft: () => Promise<OpenMsaLoginWindowState>;
+  openMSALoginWindow: () => Promise<OpenMsaLoginWindowState>;
+  onCloseMSALoginWindow: (callback: (state: CloseMsaLoginWindowState) => void) => () => void;
 };

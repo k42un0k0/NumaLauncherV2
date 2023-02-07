@@ -2,7 +2,7 @@ import path from "path";
 import { ConfigManager } from "../config/configManager";
 import { Server } from "../distribution/classes";
 import { ForgeData112 } from "../versionManifest/forgeData112";
-import { AuthAccount } from "../msAccountManager";
+import { AuthAccount } from "../config/msAccount";
 import { _lteMinorVersion } from "../utils/util";
 import { VersionData112 } from "../versionManifest/versionData112";
 import { VersionData113 } from "../versionManifest/versionData113";

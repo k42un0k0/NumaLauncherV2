@@ -1,7 +1,7 @@
 import { JavaSetting, javaSettingArgs } from "./javaSetting";
 import { GameSetting, gameSettingArgs } from "./gameSetting";
 import { LauncherSetting, launcherSettingArgs } from "./launcherSetting";
-import { AuthAccount } from "../msAccountManager";
+import { AuthAccount } from "./msAccount";
 import { ModSetting, modSettingArgs } from "./modSetting";
 import { ToPlain } from "../utils/object";
 

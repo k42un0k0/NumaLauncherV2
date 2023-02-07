@@ -1,6 +1,6 @@
 import { expect, describe, it, jest } from "@jest/globals";
 import { ConfigManager } from "./configManager";
-import { AuthAccount } from "../msAccountManager";
+import { AuthAccount } from "./msAccount";
 import { vol } from "memfs";
 import fs from "fs-extra";
 jest.mock("fs");

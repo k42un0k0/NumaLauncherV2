@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { SwitchTransition } from "react-transition-group";
-import Fade from "../components/Fade";
+import Fade from "./components/Fade";
 import { mainPreload } from "../utils/preload";
 import { useAtom, useSetAtom } from "jotai";
 import { pageJotai, PageJotai, usePageMove } from "./jotai/pageJotai";
@@ -11,21 +11,21 @@ import Frame from "./components/Frame";
 import { css } from "@emotion/react";
 import { backgroundImages } from "../../assets/ts/web";
 import Splash from "./Splash";
-import { accountsJotai } from "./jotai/accountsJotai";
-import { selectedUUIDJotai } from "./jotai/selectedUUIDJotai";
 import OverlaySelectServer from "./components/OverlaySelectServer";
+import { stateJotai } from "./jotai/stateJotai";
+import { landingSelectors } from "./Landing/selectors";
 
 export const Main = () => {
-  const setAccounts = useSetAtom(accountsJotai);
-  const setSelectedUUID = useSetAtom(selectedUUIDJotai);
+  const setState = useSetAtom(stateJotai);
+
   const pageMove = usePageMove();
   useEffect(() => {
     async function effect() {
-      const accounts = await mainPreload.config.getAccounts();
-      const selectedUUID = await mainPreload.config.getSelectedUUID();
-      setAccounts(accounts);
-      setSelectedUUID(selectedUUID);
-      if (selectedUUID) {
+      await Promise.all([mainPreload.config.load(), mainPreload.distribution.load()]);
+      const state = await mainPreload.state.getState();
+      setState(state);
+      console.log(state);
+      if (landingSelectors.account(state)) {
         pageMove.home();
         return;
       }
@@ -87,6 +87,7 @@ const styles = {
     height: 100%;
   `,
   main: css`
+    position: relative;
     height: calc(100% - 24px);
     background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.65) 100%);
   `,

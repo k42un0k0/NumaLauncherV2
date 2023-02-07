@@ -7,33 +7,18 @@ import { getVersionUrl } from "./api/mojang";
 import fetch from "node-fetch";
 import crypto from "crypto";
 import { IpcMainEvent, WebContents } from "electron";
-import { RendererChannel } from "./utils/channels";
 import { VersionData112 } from "./versionManifest/versionData112";
 import { VersionData113 } from "./versionManifest/versionData113";
 import { forEachOfLimit, getJDKPath, isDev, isForgeGradle3, isMac, mojangFriendlyOS } from "./utils/util";
-import { paths } from "./utils/paths";
 import { validateRules } from "./jvmArgBuilder/helper";
 import { ForgeData112 } from "./versionManifest/forgeData112";
 import { ForgeData113 } from "./versionManifest/forgeData113";
 import AdmZip from "adm-zip";
 import childProcess from "child_process";
-import { DistroJson } from "./distribution/json";
 import { Module, Server } from "./distribution/classes";
 import { Types } from "./distribution/constatnts";
 import { ProcessBuilder } from "./processbuilder";
 import electron from "electron";
-
-async function getRemoteDistribution(distroURL: string) {
-  const response = await axios.get<DistroJson>(distroURL, { timeout: 2500 });
-  const data = DistroManager.jsonToDistroIndex(response.data);
-  fs.writeFileSync(paths.launcher.distroFile, JSON.stringify(response.data));
-  return data;
-}
-
-async function getLocalDistribution() {
-  const buf = fs.readFileSync(paths.launcher.distroFile, "utf-8");
-  return DistroManager.jsonToDistroIndex(JSON.parse(buf));
-}
 
 async function loadVersionData(version: string) {
   const versionPath = ConfigManager.getLauncherSetting().getDataDirectory().common.versions.$join(version);
@@ -155,7 +140,7 @@ function _calculateHash(buf: Buffer, algo: string) {
   return crypto.createHash(algo).update(buf).digest("hex");
 }
 export async function runMinecraft(event: IpcMainEvent) {
-  const distribution = await getLocalDistribution();
+  const distribution = await DistroManager.INSTANCE.load();
   const selectedServer = ConfigManager.INSTANCE.config.selectedServer;
   const server = distribution.servers.find((server) => server.id == selectedServer) || distribution.servers[0];
   if (!server) {
@@ -311,10 +296,10 @@ function processDLQueues(sender: WebContents, dltrackerData: { dltracker: DLTrac
       response.body?.pipe(writeStream);
       response.body?.on("data", (chunk) => {
         progress += chunk.length;
-        sender.send(RendererChannel.RUN_MINECRAFT_EMITTER, "progress", {
-          progress,
-          totalSize,
-        });
+        // sender.send(RendererChannel.RUN_MINECRAFT_EMITTER, "progress", {
+        //   progress,
+        //   totalSize,
+        // });
       });
     });
   });

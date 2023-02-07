@@ -1,7 +1,23 @@
+import axios from "axios";
+import fs from "fs-extra";
+import { paths } from "../utils/paths";
 import { DistroIndex, Server, Module, Required, Artifact } from "./classes";
 import { DistroJson, ModuleJson } from "./json";
 
 export class DistroManager {
+  async load() {
+    const distroURL = "https://raw.githubusercontent.com/TeamKun/ModPacks/deploy/distribution.json";
+    const response = await axios.get<DistroJson>(distroURL, { timeout: 2500 });
+    const data = DistroManager.jsonToDistroIndex(response.data);
+    fs.writeFileSync(paths.launcher.distroFile, JSON.stringify(response.data));
+    return data;
+  }
+
+  async loadLocal() {
+    const buf = fs.readFileSync(paths.launcher.distroFile, "utf-8");
+    return DistroManager.jsonToDistroIndex(JSON.parse(buf));
+  }
+
   private static instance: DistroManager;
   static get INSTANCE() {
     if (DistroManager.instance == null) {

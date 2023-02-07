@@ -1,9 +1,12 @@
 import { css } from "@emotion/react";
+import { useSetAtom } from "jotai";
+import { overlaySelectServerJotai } from "../jotai/overlaySelectServerJotai";
 import { usePageMove } from "../jotai/pageJotai";
 
 type Props = { in: boolean };
 export default function DashBoard({ in: inProp }: Props) {
   const pageMove = usePageMove();
+  const setOverlay = useSetAtom(overlaySelectServerJotai);
   return (
     <div css={[styles.container, inProp && styles.containerActive]}>
       <div css={styles.main}>
@@ -65,7 +68,9 @@ export default function DashBoard({ in: inProp }: Props) {
       </div>
       <div css={styles.footer}>
         <div>a</div>
-        <div>a</div>
+        <div>
+          <button onClick={() => setOverlay(true)}>server</button>
+        </div>
       </div>
     </div>
   );

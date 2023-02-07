@@ -13,7 +13,7 @@ import { ArgBuilder112 } from "./jvmArgBuilder/argBuilder112";
 import { ArgBuilder113 } from "./jvmArgBuilder/argBuilder113";
 import { classpathArg } from "./jvmArgBuilder/classpathArgs";
 import { classpathSeparator, resolveModConfiguration } from "./jvmArgBuilder/helper";
-import { AuthAccount } from "./msAccountManager";
+import { AuthAccount } from "./config/msAccount";
 import { getJDKPath, mcVersionAtLeast, _lteMinorVersion } from "./utils/util";
 import { VersionData112 } from "./versionManifest/versionData112";
 import { VersionData113 } from "./versionManifest/versionData113";

@@ -1,11 +1,14 @@
 import { app, BrowserWindow, ipcMain } from "electron";
-import { mainWindowBuilder } from "./window";
 import { config } from "dotenv";
-import { MainChannel } from "./utils/channels";
-import { openMSALoginWindow } from "./msaLoginWindow";
+import { handleActions, MainChannel } from "./utils/channels";
 import axios from "axios";
 import { ConfigManager } from "./config/configManager";
 import { runMinecraft } from "./runMinecraft";
+import { DistroManager } from "./distribution/distroManager";
+import { mainWindowBuilder } from "./window/main";
+import { openMSALoginWindow } from "./window/msaLogin";
+import { ViewState } from "../common/types";
+import { actions, PayloadFromActionCreator } from "../common/actions";
 function bootstrap() {
   config();
   axios.interceptors.response.use(
@@ -15,7 +18,6 @@ function bootstrap() {
       throw e;
     }
   );
-  ConfigManager.INSTANCE.load();
 }
 
 if (!app.requestSingleInstanceLock()) {
@@ -29,33 +31,69 @@ function main() {
 
     mainWindow.loadFile("build/index.html");
   });
-
   app.once("window-all-closed", () => app.quit());
-  ipcMain.handle(MainChannel.OPEN_MSA_LOGIN_WINDOW, openMSALoginWindow);
-  ipcMain.handle(MainChannel.GET_SELECTED_ACCOUNT, function () {
-    return ConfigManager.INSTANCE.config.selectedUUID;
-  });
-  ipcMain.handle(MainChannel.GET_ACCOUNTS, function () {
-    return ConfigManager.INSTANCE.config.accounts;
-  });
-  ipcMain.on(MainChannel.RUN_MINECRAFT, function (event) {
-    return runMinecraft(event);
-  });
-  ipcMain.on(MainChannel.CLOSE_WINDOW, function (event) {
+
+  ipcMain.on(MainChannel.window.CLOSE, function () {
     BrowserWindow.getFocusedWindow()?.close();
   });
-  ipcMain.on(MainChannel.MINIMIZE_WINDOW, function (event) {
+  ipcMain.on(MainChannel.window.MINIMIZE, function () {
     const win = BrowserWindow.getFocusedWindow();
     win?.minimize();
-    event.sender;
   });
-  ipcMain.on(MainChannel.MAXIMIZE_WINDOW, function (event) {
+  ipcMain.on(MainChannel.window.MAXIMIZE, function () {
     const win = BrowserWindow.getFocusedWindow();
     if (win?.isMaximized()) {
       win?.unmaximize();
       return;
     }
     win?.maximize();
+  });
+  ipcMain.handle(MainChannel.config.LOAD, function () {
+    return ConfigManager.INSTANCE.load();
+  });
+
+  ipcMain.handle(MainChannel.distribution.LOAD, function () {
+    return DistroManager.INSTANCE.load();
+  });
+  ipcMain.handle(MainChannel.OPEN_MSA_LOGIN_WINDOW, openMSALoginWindow);
+  ipcMain.on(MainChannel.RUN_MINECRAFT, function (event) {
+    return runMinecraft(event);
+  });
+  ipcMain.handle(MainChannel.state.GET_STATE, function (): ViewState {
+    return {
+      overlay: {
+        selectedServer: ConfigManager.INSTANCE.config.selectedServer,
+        servers:
+          DistroManager.getDistribution()?.servers.map((server) => {
+            return {
+              icon: server.icon,
+              id: server.id,
+              description: server.description,
+              version: server.version,
+              minecraftVersion: server.minecraftVersion,
+              mainServer: server.mainServer,
+            };
+          }) || [],
+      },
+      landing: {
+        account: ConfigManager.INSTANCE.config.accounts[ConfigManager.INSTANCE.config.selectedUUID],
+      },
+      setting: {
+        account: {
+          accounts: ConfigManager.INSTANCE.config.accounts,
+          selectedUUID: ConfigManager.INSTANCE.config.selectedUUID,
+        },
+      },
+    };
+  });
+
+  handleActions({
+    [actions.overlay.selectServer.toString()]: (
+      _,
+      payload: PayloadFromActionCreator<typeof actions.overlay.selectServer>
+    ) => {
+      ConfigManager.INSTANCE.config.selectedServer = payload;
+    },
   });
 }
 

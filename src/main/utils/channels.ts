@@ -1,15 +1,34 @@
-export enum MainChannel {
-  OPEN_MSA_LOGIN_WINDOW = "OPEN_MSA_LOGIN_WINDOW",
-  GET_SELECTED_ACCOUNT = "GET_SELECTED_ACCOUNT",
-  GET_ACCOUNTS = "GET_ACCOUNTS",
-  RUN_MINECRAFT = "RUN_MINECRAFT",
-  CLOSE_WINDOW = "CLOSE_WINDOW",
-  MAXIMIZE_WINDOW = "MAXIMIZE_WINDOW",
-  MINIMIZE_WINDOW = "MINIMIZE_WINDOW",
-}
+import { ipcMain, IpcMainInvokeEvent } from "electron";
+import { Action } from "../../common/actions";
 
-export enum RendererChannel {
-  CLOSE_MSA_LOGIN_WINDOW = "CLOSE_MSA_LOGIN_WINDOW",
-  FETCH_MS_ACCOUNT = "FETCH_MS_ACCOUNT",
-  RUN_MINECRAFT_EMITTER = "RUN_MINECRAFT_EMITTER",
+export const MainChannel = {
+  window: {
+    CLOSE: "WINDOW/CLOSE",
+    MAXIMIZE: "WINDOW/MAXIMIZE",
+    MINIMIZE: "WINDOW/MINIMIZE",
+  },
+  state: {
+    GET_STATE: "STATE/GET_STATE",
+    DISPATCH: "STATE/DISPATCH",
+  },
+  config: {
+    LOAD: "CONFIG/LOAD",
+  },
+  distribution: {
+    LOAD: "DISTRIBUTION/LOAD",
+  },
+  OPEN_MSA_LOGIN_WINDOW: "OPEN_MSA_LOGIN_WINDOW",
+  RUN_MINECRAFT: "RUN_MINECRAFT",
+};
+
+export const RendererChannel = {
+  CLOSE_MSA_LOGIN_WINDOW: "WINDOW/CLOSE_MSA_LOGIN_WINDOW",
+};
+
+export function handleActions(
+  reducers: Record<string, (event: IpcMainInvokeEvent, payload: any) => void | Promise<void>>
+) {
+  ipcMain.handle(MainChannel.state.DISPATCH, (event, action: Action<any>) => {
+    return reducers[action.type](event, action.payload);
+  });
 }

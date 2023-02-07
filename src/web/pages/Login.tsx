@@ -3,25 +3,17 @@ import { useEffect, useState } from "react";
 import { mainPreload } from "../utils/preload";
 import { usePageMove } from "./jotai/pageJotai";
 import SealCircle from "../../assets/images/SealCircle.svg";
-import Overlay from "../components/Overlay";
-import { useSelectedUUID } from "./jotai/selectedUUIDJotai";
+import Overlay from "./components/Overlay";
 export default function Login() {
   const [open, setOpen] = useState(false);
-  const [selectedUUID, reloadSelectedUUID] = useSelectedUUID();
   const pageMove = usePageMove();
   useEffect(() => {
     const removeEventListeners: (() => void)[] = [];
     removeEventListeners.push(
-      mainPreload.login.onCloseMSALoginWindow((state) => {
+      mainPreload.onCloseMSALoginWindow((state) => {
         if (state === "success") {
-          reloadSelectedUUID();
           pageMove.home();
         }
-      })
-    );
-    removeEventListeners.push(
-      mainPreload.login.onFetchMSAccount((account) => {
-        console.log(account);
       })
     );
     return () => {
@@ -31,7 +23,7 @@ export default function Login() {
   return (
     <div css={styles.root}>
       <div css={[styles.main.root, open && styles.main.rootOpenOverlay]}>
-        {selectedUUID && (
+        {/* {selectedUUID && (
           <button
             onClick={() => {
               pageMove.setting();
@@ -40,13 +32,13 @@ export default function Login() {
             <div>X</div>
             <span>Cancel</span>
           </button>
-        )}
+        )} */}
         <img src={SealCircle} />
         <div>↓ CLICK HERE ! ↓</div>
         <button
           onClick={() => {
             setOpen(true);
-            mainPreload.login.openMSALoginWindow();
+            mainPreload.openMSALoginWindow();
           }}
         >
           Microsoft Login

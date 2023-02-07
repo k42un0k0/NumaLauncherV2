@@ -4,6 +4,7 @@ import os from "os";
 import { DistroManager } from "../distribution/distroManager";
 import { ForgeData112 } from "../versionManifest/forgeData112";
 import { ForgeData113 } from "../versionManifest/forgeData113";
+import { BrowserWindow } from "electron";
 export function mojangFriendlyOS() {
   if (isMac) {
     return "osx";
@@ -137,4 +138,11 @@ function getBasePath(): [SanitizedOS, MidwayPath, FileName, BasePath] {
 
 export function _lteMinorVersion(forgeData: ForgeData112 | ForgeData113, version: number) {
   return Number(forgeData.id.split("-")[0].split(".")[1]) <= Number(version);
+}
+
+export function broadcast(channel: string, ...args: any[]) {
+  const wins = BrowserWindow.getAllWindows();
+  wins.map((win) => {
+    win.webContents.send(channel, ...args);
+  });
 }

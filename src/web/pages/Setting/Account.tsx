@@ -1,19 +1,13 @@
-import { useAtom, useSetAtom } from "jotai";
-import { useEffect } from "react";
-import { mainPreload } from "../../utils/preload";
-import { accountsJotai } from "../jotai/accountsJotai";
+import { useSetAtom } from "jotai";
 import { pageJotai } from "../jotai/pageJotai";
-import { selectedUUIDJotai } from "../jotai/selectedUUIDJotai";
+import { useSelector } from "../jotai/stateJotai";
 import AccountList from "./Account/AccountList";
+import { accountSelectors } from "./selectors";
 
 export default function Account() {
-  const [accounts, setAccounts] = useAtom(accountsJotai);
-  const [selectedUUID, setSelectedUUID] = useAtom(selectedUUIDJotai);
+  const accounts = useSelector(accountSelectors.accounts);
+  const selectedUUID = useSelector(accountSelectors.selectedUUID);
   const setPage = useSetAtom(pageJotai);
-  useEffect(() => {
-    setAccounts(mainPreload.config.getAccounts());
-    setSelectedUUID(mainPreload.config.getSelectedUUID());
-  }, []);
   return (
     <div style={{ height: 1000, flex: 1 }}>
       <div>アカウント設定</div>

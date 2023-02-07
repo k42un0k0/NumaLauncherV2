@@ -62,7 +62,6 @@ export function plainToClass<T extends Def>(def: T, plain: ToPlain<InstanceType<
   );
 }
 export function mergeNonNullishValue<T>(target: T, src: T) {
-  if (typeof target !== typeof src) return target;
   if (Array.isArray(target) && Array.isArray(src)) {
     target.forEach((_, key) => {
       target[key] = mergeNonNullishValue(target[key], src[key]);
@@ -72,7 +71,7 @@ export function mergeNonNullishValue<T>(target: T, src: T) {
   if (typeof target === "object" && target != null && typeof src === "object" && src != null) {
     const typedTarget = target as Record<ObjectKey, any>;
     const typedSrc = src as Record<ObjectKey, any>;
-    Object.keys(typedTarget).map((key) => {
+    Object.keys({ ...typedTarget, ...typedSrc }).map((key) => {
       typedTarget[key] = mergeNonNullishValue(typedTarget[key], typedSrc[key]);
     });
     return target;

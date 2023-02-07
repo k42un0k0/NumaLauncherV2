@@ -3,7 +3,7 @@ import path from "path";
 import { ConfigManager } from "../config/configManager";
 import { Server } from "../distribution/classes";
 import { ForgeData113 } from "../versionManifest/forgeData113";
-import { AuthAccount } from "../msAccountManager";
+import { AuthAccount } from "../config/msAccount";
 import { mojangFriendlyOS } from "../utils/util";
 import { VersionData113, VersionData113Rules, VersionDataArg } from "../versionManifest/versionData113";
 import { argDiscovery, classpathSeparator, replaceJVMArgument, _processAutoConnectArg } from "./helper";
