@@ -3,14 +3,17 @@ import { SwitchTransition } from "react-transition-group";
 import Fade from "../components/Fade";
 import { mainPreload } from "../utils/preload";
 import { useAtom, useSetAtom } from "jotai";
-import { accountsJotai, pageJotai, PageJotai, selectedUUIDJotai, usePageMove } from "./pageJotai";
+import { pageJotai, PageJotai, usePageMove } from "./jotai/pageJotai";
 import Landing from "./Landing";
 import Login from "./Login";
 import Setting from "./Setting";
-import Frame from "./Frame";
+import Frame from "./components/Frame";
 import { css } from "@emotion/react";
 import { backgroundImages } from "../../assets/ts/web";
 import Splash from "./Splash";
+import { accountsJotai } from "./jotai/accountsJotai";
+import { selectedUUIDJotai } from "./jotai/selectedUUIDJotai";
+import OverlaySelectServer from "./components/OverlaySelectServer";
 
 export const Main = () => {
   const setAccounts = useSetAtom(accountsJotai);
@@ -31,13 +34,13 @@ export const Main = () => {
     effect();
   }, []);
   const [page] = useAtom(pageJotai);
-
   return (
     <div css={[styles.root]}>
       <div css={styles.container}>
         <Frame />
         <div css={styles.main}>
           <SwitchTransition>{mainComp(page)}</SwitchTransition>
+          <OverlaySelectServer />
         </div>
       </div>
     </div>

@@ -1,9 +1,10 @@
 import { css, keyframes } from "@emotion/react";
 import { useEffect, useState } from "react";
 import { mainPreload } from "../utils/preload";
-import { usePageMove, useSelectedUUID } from "./pageJotai";
+import { usePageMove } from "./jotai/pageJotai";
 import SealCircle from "../../assets/images/SealCircle.svg";
 import Overlay from "../components/Overlay";
+import { useSelectedUUID } from "./jotai/selectedUUIDJotai";
 export default function Login() {
   const [open, setOpen] = useState(false);
   const [selectedUUID, reloadSelectedUUID] = useSelectedUUID();

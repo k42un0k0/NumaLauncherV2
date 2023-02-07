@@ -1,5 +1,5 @@
 import { css } from "@emotion/react";
-import { mainPreload } from "../utils/preload";
+import { mainPreload } from "../../utils/preload";
 
 export default function Frame() {
   return (

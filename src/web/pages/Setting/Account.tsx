@@ -1,7 +1,9 @@
 import { useAtom, useSetAtom } from "jotai";
 import { useEffect } from "react";
 import { mainPreload } from "../../utils/preload";
-import { accountsJotai, pageJotai, selectedUUIDJotai } from "../pageJotai";
+import { accountsJotai } from "../jotai/accountsJotai";
+import { pageJotai } from "../jotai/pageJotai";
+import { selectedUUIDJotai } from "../jotai/selectedUUIDJotai";
 import AccountList from "./Account/AccountList";
 
 export default function Account() {

@@ -1,5 +1,5 @@
 import { css } from "@emotion/react";
-import { usePageMove } from "../pageJotai";
+import { usePageMove } from "../jotai/pageJotai";
 
 type Props = { in: boolean };
 export default function DashBoard({ in: inProp }: Props) {
