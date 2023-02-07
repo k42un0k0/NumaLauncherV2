@@ -1,5 +1,5 @@
 import { css } from "@emotion/react";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { usePageMove } from "../pageJotai";
 import { settingJotai } from "./settingJotai";
 
@@ -55,10 +55,7 @@ export default function Menu() {
       <div css={styles.spacer} />
       <div css={styles.divider} />
 
-      <button
-        css={[styles.button, settting == "account" ? styles.buttonActive : styles.buttonDeactive]}
-        onClick={() => pageMove.home()}
-      >
+      <button css={[styles.button, styles.closeButton]} onClick={() => pageMove.home()}>
         閉じる
       </button>
     </div>
@@ -91,6 +88,13 @@ const styles = {
   `,
   buttonActive: css`
     color: white;
+  `,
+  closeButton: css`
+    color: white;
+    :hover {
+      color: white;
+      text-shadow: 0px 0px 20px white;
+    }
   `,
   spacer: css`
     height: 30px;

@@ -1,10 +1,15 @@
-import { ComponentProps, ReactNode, useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { Transition } from "react-transition-group";
+import { TransitionProps } from "react-transition-group/Transition";
+
+// `TransitionProps` has `[prop: string]: any` property. so `OmitedTransitionProps` is `any`;
+type OmitedTransitionProps = Omit<TransitionProps<HTMLDivElement>, "addEndListener" | "children">;
 
 type Props = {
   children: ReactNode;
-} & Omit<ComponentProps<typeof Transition>, "children">;
-export default function Fade({ children, ...props }: Props) {
+} & OmitedTransitionProps;
+
+export default function Fade({ children, className, timeout = 1000, ...props }: Props) {
   console.log(props);
   const ref = useRef(null);
   const transitionProperties = {
@@ -15,12 +20,12 @@ export default function Fade({ children, ...props }: Props) {
     unmounted: {},
   };
   return (
-    <Transition nodeRef={ref} timeout={1000} mountOnEnter {...props}>
+    <Transition nodeRef={ref} timeout={timeout} mountOnEnter {...props}>
       {(state) => {
         return (
           <div
             ref={ref}
-            className={props.className}
+            className={className}
             style={{
               transition: "1000ms",
               opacity: 0,
