@@ -1,5 +1,3 @@
-import { ipcMain, IpcMainEvent, IpcMainInvokeEvent } from "electron";
-
 export type Action<T> = { type: string; payload: T };
 export type PayloadFromActionCreator<T> = T extends ActionCreator<infer T> ? T : never;
 type ActionCreator<T> = ((payload: T) => Action<T>) & { toString(): string };

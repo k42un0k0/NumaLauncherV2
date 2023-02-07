@@ -6,7 +6,7 @@ import { ConfigManager } from "./config/configManager";
 import { runMinecraft } from "./runMinecraft";
 import { DistroManager } from "./distribution/distroManager";
 import { mainWindowBuilder } from "./window/main";
-import { openMSALoginWindow } from "./window/msaLogin";
+import { MSAWindowManager } from "./window/msaLogin";
 import { ViewState } from "../common/types";
 import { actions, PayloadFromActionCreator } from "../common/actions";
 function bootstrap() {
@@ -55,7 +55,14 @@ function main() {
   ipcMain.handle(MainChannel.distribution.LOAD, function () {
     return DistroManager.INSTANCE.load();
   });
-  ipcMain.handle(MainChannel.OPEN_MSA_LOGIN_WINDOW, openMSALoginWindow);
+  ipcMain.handle(MainChannel.OPEN_MSA_LOGIN_WINDOW, () => {
+    const windowManager = MSAWindowManager.INSTANCE;
+    if (windowManager.hasWindowInstance()) {
+      return "already";
+    }
+    windowManager.createWindow();
+    return "success";
+  });
   ipcMain.on(MainChannel.RUN_MINECRAFT, function (event) {
     return runMinecraft(event);
   });
@@ -93,6 +100,7 @@ function main() {
       payload: PayloadFromActionCreator<typeof actions.overlay.selectServer>
     ) => {
       ConfigManager.INSTANCE.config.selectedServer = payload;
+      ConfigManager.INSTANCE.save();
     },
   });
 }

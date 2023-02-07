@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import { useSetAtom } from "jotai";
-import { overlaySelectServerJotai } from "../jotai/overlaySelectServerJotai";
-import { usePageMove } from "../jotai/pageJotai";
+import { overlaySelectServerJotai } from "../utils/overlaySelectServerJotai";
+import { usePageMove } from "../utils/pageJotai";
 
 type Props = { in: boolean };
 export default function DashBoard({ in: inProp }: Props) {

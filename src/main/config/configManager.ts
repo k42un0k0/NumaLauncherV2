@@ -68,7 +68,7 @@ export class ConfigManager {
       cls: Config,
       args: configArgs,
     };
-    this.config = mergeNonNullishValue(Config.default(), plainToClass(def, config));
+    this.config = mergeNonNullishValue(this.config, plainToClass(def, config));
     this.save();
   }
 }

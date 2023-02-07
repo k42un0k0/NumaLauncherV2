@@ -1,5 +1,5 @@
 import { createSelector } from "reselect";
-import { selectors } from "../jotai/selector";
+import { selectors } from "../utils/selector";
 
 export const settingSelectors = {
   account: createSelector(selectors.setting, (state) => state.account),

@@ -7,3 +7,8 @@ export const selectors = {
   setting: createSelector(stateSelector, (state) => state.setting),
   overlay: createSelector(stateSelector, (state) => state.overlay),
 };
+
+export const overlaySelector = {
+  servers: createSelector(selectors.overlay, (state) => state.servers),
+  selectedServer: createSelector(selectors.overlay, (state) => state.selectedServer),
+};

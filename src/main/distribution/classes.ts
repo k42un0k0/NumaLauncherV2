@@ -4,7 +4,7 @@ import { ArtifactJson, DiscordJson, DiscordJson2, DistroJson, ManualJson, Module
 import { Types } from "./constatnts";
 
 export class DistroIndex implements DistroJson {
-  mainServer?: string;
+  mainServer: string;
   constructor(public version: string, public rss: string, public discord: DiscordJson, public servers: Server[]) {
     this.mainServer = this.servers.find((server) => server.mainServer)?.id || this.servers[0]?.id;
   }

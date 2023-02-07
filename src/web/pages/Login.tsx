@@ -1,7 +1,7 @@
 import { css, keyframes } from "@emotion/react";
 import { useEffect, useState } from "react";
 import { mainPreload } from "../utils/preload";
-import { usePageMove } from "./jotai/pageJotai";
+import { usePageMove } from "./utils/pageJotai";
 import SealCircle from "../../assets/images/SealCircle.svg";
 import Overlay from "./components/Overlay";
 export default function Login() {

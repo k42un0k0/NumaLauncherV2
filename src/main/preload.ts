@@ -17,7 +17,7 @@ const preload: MainPreload = {
   },
   state: {
     getState: () => ipcRenderer.invoke(MainChannel.state.GET_STATE),
-    dispatch: (action) => ipcRenderer.invoke(MainChannel.state.GET_STATE, action),
+    dispatch: (action) => ipcRenderer.invoke(MainChannel.state.DISPATCH, action),
   },
   openMSALoginWindow: () => ipcRenderer.invoke(MainChannel.OPEN_MSA_LOGIN_WINDOW),
   onCloseMSALoginWindow: (callback) => {

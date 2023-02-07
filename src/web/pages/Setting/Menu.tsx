@@ -1,6 +1,6 @@
 import { css } from "@emotion/react";
 import { useAtom } from "jotai";
-import { usePageMove } from "../jotai/pageJotai";
+import { usePageMove } from "../utils/pageJotai";
 import { settingJotai } from "./settingJotai";
 
 export default function Menu() {

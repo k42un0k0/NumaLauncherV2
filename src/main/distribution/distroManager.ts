@@ -1,5 +1,6 @@
 import axios from "axios";
 import fs from "fs-extra";
+import { ConfigManager } from "../config/configManager";
 import { paths } from "../utils/paths";
 import { DistroIndex, Server, Module, Required, Artifact } from "./classes";
 import { DistroJson, ModuleJson } from "./json";
@@ -10,6 +11,13 @@ export class DistroManager {
     const response = await axios.get<DistroJson>(distroURL, { timeout: 2500 });
     const data = DistroManager.jsonToDistroIndex(response.data);
     fs.writeFileSync(paths.launcher.distroFile, JSON.stringify(response.data));
+    if (
+      !ConfigManager.INSTANCE.config.selectedServer ||
+      this.data?.getServer(ConfigManager.INSTANCE.config.selectedServer) == null
+    ) {
+      ConfigManager.INSTANCE.config.selectedServer = data.mainServer;
+      ConfigManager.INSTANCE.save();
+    }
     return data;
   }
 
@@ -62,7 +70,8 @@ export class DistroManager {
         server.discord,
         server.mainServer,
         server.autoconnect,
-        subModules(server.modules, server.id)
+        subModules(server.modules, server.id),
+        server.icon
       );
     });
 

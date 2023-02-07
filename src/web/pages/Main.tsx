@@ -3,7 +3,7 @@ import { SwitchTransition } from "react-transition-group";
 import Fade from "./components/Fade";
 import { mainPreload } from "../utils/preload";
 import { useAtom, useSetAtom } from "jotai";
-import { pageJotai, PageJotai, usePageMove } from "./jotai/pageJotai";
+import { pageJotai, PageJotai, usePageMove } from "./utils/pageJotai";
 import Landing from "./Landing";
 import Login from "./Login";
 import Setting from "./Setting";
@@ -11,8 +11,8 @@ import Frame from "./components/Frame";
 import { css } from "@emotion/react";
 import { backgroundImages } from "../../assets/ts/web";
 import Splash from "./Splash";
-import OverlaySelectServer from "./components/OverlaySelectServer";
-import { stateJotai } from "./jotai/stateJotai";
+import OverlaySelectServer from "./OverlaySelectServer";
+import { stateJotai } from "./utils/stateJotai";
 import { landingSelectors } from "./Landing/selectors";
 
 export const Main = () => {

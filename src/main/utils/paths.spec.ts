@@ -20,7 +20,7 @@ describe("genPaths", () => {
       expect(paths.src.configFile).toBe("/home/config.json");
     }
   });
-  it("should return if passed function", () => {
+  it("should return path object if passed function", () => {
     const paths = genPaths(
       {
         first: () => {

@@ -1,6 +1,6 @@
 import { useSetAtom } from "jotai";
-import { pageJotai } from "../jotai/pageJotai";
-import { useSelector } from "../jotai/stateJotai";
+import { pageJotai } from "../utils/pageJotai";
+import { useSelector } from "../utils/stateJotai";
 import AccountList from "./Account/AccountList";
 import { accountSelectors } from "./selectors";
 

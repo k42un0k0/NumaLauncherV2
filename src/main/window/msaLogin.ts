@@ -5,7 +5,7 @@ import { RendererChannel } from "../utils/channels";
 import { broadcast } from "../utils/util";
 const redirectUriPrefix = "https://login.microsoftonline.com/common/oauth2/nativeclient?";
 
-class MSAWindowManager {
+export class MSAWindowManager {
   private static instance?: MSAWindowManager;
   static get INSTANCE() {
     if (MSAWindowManager.instance != null) return MSAWindowManager.instance;
@@ -75,13 +75,4 @@ function redirectUriToQuery(uri: string): Map<string, string> {
     queryMap.set(arr[0], decodeURI(arr[1]));
   });
   return queryMap;
-}
-
-export async function openMSALoginWindow() {
-  const windowManager = MSAWindowManager.INSTANCE;
-  if (windowManager.hasWindowInstance()) {
-    return "already";
-  }
-  windowManager.createWindow();
-  return "success";
 }
