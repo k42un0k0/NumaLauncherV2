@@ -2,33 +2,35 @@ import { useEffect } from "react";
 import { SwitchTransition } from "react-transition-group";
 import Fade from "../components/Fade";
 import { mainPreload } from "../utils/preload";
-import { useAtom } from "jotai";
-import { pageJotai, PageJotai } from "./pageJotai";
+import { useAtom, useSetAtom } from "jotai";
+import { accountsJotai, pageJotai, PageJotai, selectedUUIDJotai, usePageMove } from "./pageJotai";
 import Landing from "./Landing";
 import Login from "./Login";
 import Setting from "./Setting";
 import Frame from "./Frame";
 import { css } from "@emotion/react";
 import { backgroundImages } from "../../assets/ts/web";
+import Splash from "./Splash";
 
 export const Main = () => {
-  const [page] = useAtom(pageJotai);
+  const setAccounts = useSetAtom(accountsJotai);
+  const setSelectedUUID = useSetAtom(selectedUUIDJotai);
+  const pageMove = usePageMove();
   useEffect(() => {
-    const removeEventListeners: (() => void)[] = [];
-    removeEventListeners.push(
-      mainPreload.login.onCloseMSALoginWindow((state) => {
-        console.log(state);
-      })
-    );
-    removeEventListeners.push(
-      mainPreload.login.onFetchMSAccount((account) => {
-        console.log(account);
-      })
-    );
-    return () => {
-      removeEventListeners.forEach((f) => f());
-    };
-  });
+    async function effect() {
+      const accounts = await mainPreload.config.getAccounts();
+      const selectedUUID = await mainPreload.config.getSelectedUUID();
+      setAccounts(accounts);
+      setSelectedUUID(selectedUUID);
+      if (selectedUUID) {
+        pageMove.home();
+        return;
+      }
+      pageMove.login();
+    }
+    effect();
+  }, []);
+  const [page] = useAtom(pageJotai);
 
   return (
     <div css={[styles.root]}>
@@ -43,6 +45,12 @@ export const Main = () => {
 };
 function mainComp(page: PageJotai) {
   switch (page) {
+    case "splash":
+      return (
+        <Fade key="splash">
+          <Splash />
+        </Fade>
+      );
     case "home":
       return (
         <Fade key="home">

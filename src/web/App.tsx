@@ -17,6 +17,7 @@ export const App = () => {
             background-color: transparent;
             padding: 0;
             cursor: pointer;
+            color: currentColor;
           }
         `}
       />
