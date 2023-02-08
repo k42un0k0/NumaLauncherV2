@@ -11,11 +11,7 @@ export default {
   component: FileInput,
 };
 
-const Template = (_: ComponentProps<typeof FileInput>) => <FileInput />;
+const Template = (_: ComponentProps<typeof FileInput>) => <FileInput>ファイルを選択</FileInput>;
 
 export const Primary: ComponentStory<typeof FileInput> = Template.bind({});
-Primary.args = {
-  defaultValue: 3,
-  min: 0,
-  max: 10,
-};
+Primary.args = {};

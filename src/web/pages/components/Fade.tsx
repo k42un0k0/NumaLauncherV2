@@ -1,6 +1,7 @@
-import { ReactNode, useRef } from "react";
+import { forwardRef, ReactNode, useRef } from "react";
 import { Transition } from "react-transition-group";
 import { TransitionProps } from "react-transition-group/Transition";
+import useForkRef from "../utils/useForkRef";
 
 // `TransitionProps` has `[prop: string]: any` property. so `OmitedTransitionProps` is `any`;
 type OmitedTransitionProps = Omit<TransitionProps<HTMLDivElement>, "addEndListener" | "children">;
@@ -8,10 +9,10 @@ type OmitedTransitionProps = Omit<TransitionProps<HTMLDivElement>, "addEndListen
 type Props = {
   children: ReactNode;
 } & OmitedTransitionProps;
-
-export default function Fade({ children, className, timeout = 1000, ...props }: Props) {
-  console.log(props);
-  const ref = useRef(null);
+forwardRef;
+export default forwardRef<HTMLDivElement, Props>(function Fade({ children, className, timeout = 1000, ...props }, ref) {
+  const nodeRef = useRef<HTMLDivElement | null>(null);
+  const forkedRef = useForkRef(nodeRef, ref);
   const transitionProperties = {
     entered: { opacity: 1 },
     entering: { opacity: 1 },
@@ -20,14 +21,14 @@ export default function Fade({ children, className, timeout = 1000, ...props }: 
     unmounted: {},
   };
   return (
-    <Transition nodeRef={ref} timeout={timeout} mountOnEnter {...props}>
+    <Transition nodeRef={nodeRef} timeout={timeout} mountOnEnter {...props}>
       {(state) => {
         return (
           <div
-            ref={ref}
+            ref={forkedRef}
             className={className}
             style={{
-              transition: "1000ms",
+              transition: `${timeout}ms opacity`,
               opacity: 0,
               ...transitionProperties[state],
             }}
@@ -38,4 +39,4 @@ export default function Fade({ children, className, timeout = 1000, ...props }: 
       }}
     </Transition>
   );
-}
+});
