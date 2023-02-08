@@ -7,7 +7,7 @@ export type MainPreload = {
     minimize: () => void;
     maximize: () => void;
   };
-  state: {
+  view: {
     getState(): Promise<ViewState>;
     dispatch(action: Action<unknown>): Promise<void>;
   };

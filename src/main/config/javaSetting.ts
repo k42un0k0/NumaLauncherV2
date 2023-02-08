@@ -2,18 +2,13 @@ import os from "os";
 export const javaSettingArgs = ["minRAM", "maxRAM", "executable", "jvmOptions"];
 export class JavaSetting {
   static default() {
-    return new JavaSetting(resolveMinRAM(), resolveMaxRAM(), null, ["-Xmn1G", "-Dfile.encoding=utf-8"]);
+    return new JavaSetting(resolveMinRAM(), resolveMaxRAM(), "", ["-Xmn1G", "-Dfile.encoding=utf-8"]);
   }
-  constructor(
-    public minRAM: string,
-    public maxRAM: string,
-    public executable: string | null,
-    public jvmOptions: string[]
-  ) {}
+  constructor(public minRAM: string, public maxRAM: string, public executable: string, public jvmOptions: string[]) {}
   getExecutable() {
     return this.executable;
   }
-  setExecutable(executable: string | null) {
+  setExecutable(executable: string) {
     this.executable = executable;
   }
 }

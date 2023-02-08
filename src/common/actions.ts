@@ -14,7 +14,10 @@ export const actions = {
   },
   setting: {
     java: {
-      setExecutable: createAction<string>("SETTING/JAVA/SETEXECUTABLE"),
+      setExecutable: createAction<string>("SETTING/JAVA/SET_EXECUTABLE"),
+      setMinRAM: createAction<number>("SETTING/JAVA/SET_MINRAM"),
+      setMaxRAM: createAction<number>("SETTING/JAVA/SET_MAXRAM"),
+      setJvmOptions: createAction<string>("SETTING/JAVA/SET_JVM_OPTIONS"),
     },
   },
 };

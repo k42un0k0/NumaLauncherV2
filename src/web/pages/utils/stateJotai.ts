@@ -6,7 +6,26 @@ import { mainPreload } from "../../utils/preload";
 export const stateJotai = atom<ViewState>({
   overlay: { servers: [], selectedServer: "" },
   landing: { account: undefined },
-  setting: { account: { accounts: {}, selectedUUID: "" } },
+  setting: {
+    account: { accounts: {}, selectedUUID: "" },
+    minecraft: {
+      resWidth: 0,
+      resHeight: 0,
+      fullscreen: false,
+      autoConnect: false,
+      optionStandize: false,
+    },
+    java: {
+      minRAM: 0,
+      maxRAM: 0,
+      executable: "",
+      jvmOptionValue: "",
+    },
+    launcher: {
+      allowPrerelease: false,
+      dataDirectory: "",
+    },
+  },
 });
 
 export function useSelector<T extends (state: ViewState) => any>(selector: T): ReturnType<T> {
@@ -16,7 +35,7 @@ export function useSelector<T extends (state: ViewState) => any>(selector: T): R
 export function useDispatch() {
   const setState = useSetAtom(stateJotai);
   return async (action: Action<unknown>) => {
-    await mainPreload.state.dispatch(action);
-    setState(await mainPreload.state.getState());
+    await mainPreload.view.dispatch(action);
+    setState(await mainPreload.view.getState());
   };
 }

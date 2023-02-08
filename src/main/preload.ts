@@ -15,20 +15,20 @@ const preload: MainPreload = {
       ipcRenderer.send(MainChannel.window.MAXIMIZE);
     },
   },
-  state: {
+  view: {
     getState: () => ipcRenderer.invoke(MainChannel.state.GET_STATE),
     dispatch: (action) => ipcRenderer.invoke(MainChannel.state.DISPATCH, action),
-  },
-  openMSALoginWindow: () => ipcRenderer.invoke(MainChannel.OPEN_MSA_LOGIN_WINDOW),
-  onCloseMSALoginWindow: (callback) => {
-    ipcRenderer.on(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, (_, state: CloseMsaLoginWindowState) => callback(state));
-    return () => ipcRenderer.off(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, callback);
   },
   config: {
     load: () => ipcRenderer.invoke(MainChannel.config.LOAD),
   },
   distribution: {
     load: () => ipcRenderer.invoke(MainChannel.distribution.LOAD),
+  },
+  openMSALoginWindow: () => ipcRenderer.invoke(MainChannel.OPEN_MSA_LOGIN_WINDOW),
+  onCloseMSALoginWindow: (callback) => {
+    ipcRenderer.on(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, (_, state: CloseMsaLoginWindowState) => callback(state));
+    return () => ipcRenderer.off(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, callback);
   },
   runMinecraft: () => ipcRenderer.invoke(MainChannel.RUN_MINECRAFT),
 };

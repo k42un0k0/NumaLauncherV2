@@ -7,7 +7,7 @@ export class LauncherSetting {
   static default() {
     return new LauncherSetting(false, true, paths.sysRoot.$join(defaultDataDir));
   }
-  constructor(public allowPrerelease: boolean, public optionStandardize: boolean, private dataDirectory: string) {}
+  constructor(public allowPrerelease: boolean, public optionStandardize: boolean, public dataDirectory: string) {}
   getDataDirectory() {
     return genPaths(
       {

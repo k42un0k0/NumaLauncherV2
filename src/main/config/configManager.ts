@@ -46,10 +46,8 @@ export class ConfigManager {
 
   load() {
     if (!fs.existsSync(paths.launcher.configFile)) {
-      console.log("hello");
       // Create all parent directories.
       fs.ensureDirSync(paths.launcher.$path);
-      this.config = Config.default();
       this.save();
       return;
     }
@@ -59,7 +57,6 @@ export class ConfigManager {
     } catch (err) {
       console.log(err);
       fs.ensureDirSync(paths.launcher.$path);
-      this.config = Config.default();
       this.save();
       return;
     }

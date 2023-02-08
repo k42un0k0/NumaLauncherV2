@@ -2,7 +2,7 @@ import { useSetAtom } from "jotai";
 import { pageJotai } from "../utils/pageJotai";
 import { useSelector } from "../utils/stateJotai";
 import AccountList from "./Account/AccountList";
-import { accountSelectors } from "./selectors";
+import { accountSelectors } from "./utils/selectors";
 
 export default function Account() {
   const accounts = useSelector(accountSelectors.accounts);

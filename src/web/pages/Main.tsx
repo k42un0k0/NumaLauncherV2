@@ -22,7 +22,7 @@ export const Main = () => {
   useEffect(() => {
     async function effect() {
       await Promise.all([mainPreload.config.load(), mainPreload.distribution.load()]);
-      const state = await mainPreload.state.getState();
+      const state = await mainPreload.view.getState();
       setState(state);
       console.log(state);
       if (landingSelectors.account(state)) {
