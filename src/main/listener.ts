@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain } from "electron";
+import { BrowserWindow, ipcMain, shell } from "electron";
 import { handleActions, MainChannel } from "./utils/channels";
 import { ConfigManager } from "./config/configManager";
 import { runMinecraft } from "./runMinecraft";
@@ -6,6 +6,7 @@ import { DistroManager } from "./distribution/distroManager";
 import { MSAWindowManager } from "./window/msaLogin";
 import { ViewState } from "../common/types";
 import { actions, PayloadFromActionCreator } from "../common/actions";
+import fs from "fs-extra";
 
 export function setListener() {
   windowListener();
@@ -109,6 +110,12 @@ function globalListener() {
   });
   ipcMain.on(MainChannel.RUN_MINECRAFT, function (event) {
     return runMinecraft(event);
+  });
+  ipcMain.on(MainChannel.OPEN_SERVER_DIR, function () {
+    const serv = DistroManager.getDistribution()!.getServer(ConfigManager.INSTANCE.config.selectedServer);
+    const CACHE_SETTINGS_MODS_DIR = ConfigManager.getLauncherSetting().getDataDirectory().instances.$join(serv!.id);
+    fs.ensureDirSync(CACHE_SETTINGS_MODS_DIR);
+    shell.openPath(CACHE_SETTINGS_MODS_DIR);
   });
 }
 

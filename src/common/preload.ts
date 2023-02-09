@@ -20,4 +20,5 @@ export type MainPreload = {
   runMinecraft: () => Promise<OpenMsaLoginWindowState>;
   openMSALoginWindow: () => Promise<OpenMsaLoginWindowState>;
   onCloseMSALoginWindow: (callback: (state: CloseMsaLoginWindowState) => void) => () => void;
+  openServerDir: () => void;
 };

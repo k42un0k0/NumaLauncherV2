@@ -19,6 +19,7 @@ export const MainChannel = {
   },
   OPEN_MSA_LOGIN_WINDOW: "OPEN_MSA_LOGIN_WINDOW",
   RUN_MINECRAFT: "RUN_MINECRAFT",
+  OPEN_SERVER_DIR: "OPEN_SERVER_DIR",
 };
 
 export const RendererChannel = {

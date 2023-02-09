@@ -13,7 +13,7 @@ import { backgroundImages } from "../../assets/ts/web";
 import Splash from "./Splash";
 import OverlaySelectServer from "./OverlaySelectServer";
 import { stateJotai } from "./utils/stateJotai";
-import { landingSelectors } from "./Landing/selectors";
+import { landingSelectors } from "./Landing/utils/selectors";
 
 export const Main = () => {
   const setState = useSetAtom(stateJotai);

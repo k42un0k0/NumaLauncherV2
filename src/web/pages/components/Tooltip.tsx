@@ -1,8 +1,7 @@
 import { css } from "@emotion/react";
-import { cloneElement, Fragment, ReactElement, ReactNode, useEffect, useRef, useState } from "react";
+import { cloneElement, ReactElement, ReactNode, useEffect, useRef, useState } from "react";
 import { TransitionGroup } from "react-transition-group";
 import Fade from "./Fade";
-import Portal from "./Portal";
 
 type Props = { children: ReactElement; tooltip: ReactNode };
 
@@ -19,15 +18,12 @@ export default function Tooltip({ children, tooltip }: Props) {
   };
   function computeTooltipPosition() {
     if (!tooltipRef.current) return;
-    const clientRect = ref.current!.getBoundingClientRect();
-    const targetTop = clientRect.y;
-    const targetLeft = clientRect.x;
     const targetHeight = ref.current!.offsetHeight;
     const toolTipWidth = tooltipRef.current.offsetWidth;
     const toolTipHeight = tooltipRef.current.offsetHeight;
     const marginRight = 15;
-    const top = targetTop + targetHeight / 2 - toolTipHeight / 2;
-    const left = targetLeft + -toolTipWidth - marginRight;
+    const top = targetHeight / 2 - toolTipHeight / 2;
+    const left = -toolTipWidth - marginRight;
     setPos({
       top: `${top}px`,
       left: `${left}px`,
@@ -38,7 +34,7 @@ export default function Tooltip({ children, tooltip }: Props) {
   }, [open]);
   return (
     <div css={styles.root}>
-      <TransitionGroup component={Portal}>
+      <TransitionGroup>
         {open ? (
           <Fade css={[styles.tooltip, css(pos)]} ref={tooltipRef} timeout={200}>
             {tooltip}
@@ -60,6 +56,7 @@ const styles = {
     position: relative;
   `,
   tooltip: css`
+    font-size: 12px;
     position: absolute;
     width: 100px;
     text-align: center;
