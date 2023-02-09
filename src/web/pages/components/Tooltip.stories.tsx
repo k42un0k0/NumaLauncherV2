@@ -16,7 +16,7 @@ const Template = (props: ComponentProps<typeof Tooltip>) => (
     style={{
       position: "absolute",
       display: "inline-block",
-      left: "400px",
+      margin: "auto",
     }}
   >
     <Tooltip {...props} />

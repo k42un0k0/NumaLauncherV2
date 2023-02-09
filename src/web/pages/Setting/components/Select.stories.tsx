@@ -14,8 +14,4 @@ export default {
 const Template = (_: ComponentProps<typeof Select>) => <Select />;
 
 export const Primary: ComponentStory<typeof Select> = Template.bind({});
-Primary.args = {
-  defaultValue: 3,
-  min: 0,
-  max: 10,
-};
+Primary.args = {};

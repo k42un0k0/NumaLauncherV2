@@ -2,7 +2,7 @@ import { cloneElement, ReactElement, useEffect, useRef } from "react";
 
 type Props = { children: ReactElement; onClickAway: (e: MouseEvent) => void };
 
-export default function ClickAwayListenr({ children, onClickAway }: Props) {
+export default function ClickAwayListener({ children, onClickAway }: Props) {
   const syntheticEventRef = useRef(false);
   useEffect(() => {
     const click = (e: MouseEvent) => {
