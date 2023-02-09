@@ -1,5 +1,5 @@
 import { createSelector } from "reselect";
-import { settingSelectors } from "../../utils/selector";
+import { settingSelectors } from "../../utils/selectors";
 
 export const accountSelectors = {
   accounts: createSelector(settingSelectors.account, (state) => state.accounts),

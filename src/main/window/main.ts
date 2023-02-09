@@ -1,6 +1,6 @@
 import { BrowserWindow, BrowserWindowConstructorOptions } from "electron";
-import { getPlatformIcon } from "../../assets/ts";
-import { SealCircleSet } from "../../assets/ts/main";
+import { getPlatformIcon } from "@/assets/ts";
+import { SealCircleSet } from "@/assets/ts/main";
 import { paths } from "../utils/paths";
 import { shell } from "electron";
 interface WindowBuilder {

@@ -1,5 +1,5 @@
 import { isWin } from "../../utils/utils";
-import { settingSelectors } from "../utils/selector";
+import { settingSelectors } from "../utils/selectors";
 import { useSelector } from "../utils/stateJotai";
 
 export default function Account() {

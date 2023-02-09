@@ -1,4 +1,4 @@
-import { paths } from "../../main/utils/paths";
+import { paths } from "@/main/utils/paths";
 import SealCircleWin32 from "../images/SealCircle.ico";
 import SealCircleLinux from "../images/SealCircle.svg";
 

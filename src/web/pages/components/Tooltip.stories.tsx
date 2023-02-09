@@ -11,26 +11,29 @@ export default {
   component: Tooltip,
 };
 
-const Template = (props: ComponentProps<typeof Tooltip>) => (
+export const Primary: ComponentStory<typeof Tooltip> = () => (
   <div
     style={{
       position: "absolute",
       display: "inline-block",
-      margin: "auto",
+      marginLeft: 200,
     }}
   >
-    <Tooltip {...props} />
+    <Tooltip tooltip={<>hello</>}>
+      <div>こんにちは</div>
+    </Tooltip>
   </div>
 );
 
-export const Primary: ComponentStory<typeof Tooltip> = Template.bind({});
-Primary.args = {
-  tooltip: (
-    <>
-      hello
-      <br />
-      こんばんは
-    </>
-  ),
-  children: <div>こんにちは</div>,
-};
+export const Secondary: ComponentStory<typeof Tooltip> = () => (
+  <div
+    style={{
+      position: "absolute",
+      display: "inline-block",
+    }}
+  >
+    <Tooltip tooltip={<>hello</>}>
+      <div>こんにちは</div>
+    </Tooltip>
+  </div>
+);

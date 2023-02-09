@@ -8,6 +8,7 @@ type Props = { children: ReactElement; tooltip: ReactNode };
 export default function Tooltip({ children, tooltip }: Props) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: "0", left: "0" });
+  const [place, setPlace] = useState("left");
   const ref = useRef<HTMLElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const onMouseOver = () => {
@@ -18,16 +19,28 @@ export default function Tooltip({ children, tooltip }: Props) {
   };
   function computeTooltipPosition() {
     if (!tooltipRef.current) return;
+    const clientRect = ref.current!.getBoundingClientRect();
     const targetHeight = ref.current!.offsetHeight;
     const toolTipWidth = tooltipRef.current.offsetWidth;
     const toolTipHeight = tooltipRef.current.offsetHeight;
-    const marginRight = 15;
+    const margin = 15;
     const top = targetHeight / 2 - toolTipHeight / 2;
-    const left = -toolTipWidth - marginRight;
+    const leftForLeft = -toolTipWidth - margin;
+    const leftForRight = toolTipWidth + margin;
+    console.log(clientRect.x + leftForLeft);
+    if (clientRect.x + leftForLeft > 0) {
+      setPos({
+        top: `${top}px`,
+        left: `${leftForLeft}px`,
+      });
+      setPlace("left");
+      return;
+    }
     setPos({
       top: `${top}px`,
-      left: `${left}px`,
+      left: `${leftForRight}px`,
     });
+    setPlace("right");
   }
   useEffect(() => {
     computeTooltipPosition();
@@ -36,7 +49,16 @@ export default function Tooltip({ children, tooltip }: Props) {
     <div css={styles.root}>
       <TransitionGroup>
         {open ? (
-          <Fade css={[styles.tooltip, css(pos)]} ref={tooltipRef} timeout={200}>
+          <Fade
+            css={[
+              styles.tooltip,
+              css(pos),
+              place === "left" && styles.tooltipLeft,
+              place === "right" && styles.tooltipRight,
+            ]}
+            ref={tooltipRef}
+            timeout={200}
+          >
             {tooltip}
           </Fade>
         ) : undefined}
@@ -55,6 +77,16 @@ const styles = {
   root: css`
     position: relative;
   `,
+  tooltipLeft: css`
+    ::after {
+      right: -5px;
+    }
+  `,
+  tooltipRight: css`
+    ::after {
+      left: -5px;
+    }
+  `,
   tooltip: css`
     font-size: 12px;
     position: absolute;
@@ -69,7 +101,6 @@ const styles = {
       position: absolute;
       height: 10px;
       width: 10px;
-      right: -5px;
       top: calc(50% - 5px);
       background-color: black;
       transform: rotate(-45deg) matrix(1, 0.2, 0.2, 1, 0, 0);

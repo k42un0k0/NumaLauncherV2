@@ -10,6 +10,7 @@ const common: Configuration = {
   externals: ["fsevents"],
   resolve: {
     extensions: [".js", ".ts", ".jsx", ".tsx", ".json"],
+    alias: { "@": path.join(__dirname, "./src/") },
   },
   output: {
     publicPath: "./",

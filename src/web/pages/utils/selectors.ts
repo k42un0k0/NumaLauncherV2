@@ -3,9 +3,13 @@ import { ViewState } from "../../../common/types";
 
 const stateSelector = (state: ViewState) => state;
 export const selectors = {
-  landing: createSelector(stateSelector, (state: ViewState) => state.landing),
+  landing: createSelector(stateSelector, (state) => state.landing),
   setting: createSelector(stateSelector, (state) => state.setting),
   overlay: createSelector(stateSelector, (state) => state.overlay),
+};
+
+export const landingSelectors = {
+  account: createSelector(selectors.landing, (state) => state.account),
 };
 
 export const settingSelectors = {
@@ -15,7 +19,7 @@ export const settingSelectors = {
   launcher: createSelector(selectors.setting, (state) => state.launcher),
 };
 
-export const overlaySelector = {
+export const overlaySelectors = {
   servers: createSelector(selectors.overlay, (state) => state.servers),
   selectedServer: createSelector(selectors.overlay, (state) => state.selectedServer),
 };

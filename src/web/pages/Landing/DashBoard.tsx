@@ -5,7 +5,7 @@ import { usePageMove } from "../utils/pageJotai";
 import SealCircle from "../../../assets/images/SealCircle.svg";
 import Profile from "./DashBoard/Profile";
 import { useSelector } from "../utils/stateJotai";
-import { landingSelectors } from "./utils/selectors";
+import { landingSelectors } from "../utils/selectors";
 import Tooltip from "../components/Tooltip";
 import { mainPreload } from "../../utils/preload";
 

@@ -1,5 +1,5 @@
+import { Action } from "@/common/actions";
 import { ipcMain, IpcMainInvokeEvent } from "electron";
-import { Action } from "../../common/actions";
 
 export const MainChannel = {
   window: {

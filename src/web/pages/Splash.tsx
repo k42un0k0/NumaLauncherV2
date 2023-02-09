@@ -1,7 +1,7 @@
 import { css, keyframes } from "@emotion/react";
-import text from "../../assets/images/LoadingText.svg";
-import seal from "../../assets/images/LoadingSeal.svg";
-import back from "../../assets/images/LoadingBack.svg";
+import text from "@/assets/images/LoadingText.svg";
+import seal from "@/assets/images/LoadingSeal.svg";
+import back from "@/assets/images/LoadingBack.svg";
 
 export default function Splash() {
   return (

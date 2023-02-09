@@ -1,5 +1,5 @@
+import { isWindows } from "@/main/utils/util";
 import { fs } from "memfs";
-import { isWindows } from "../../main/utils/util";
 import { IconSet } from "./types";
 
 export function getPlatformIcon(imageSet: IconSet) {

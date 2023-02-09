@@ -1,7 +1,7 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import { Action } from "../../../common/actions";
-import { ViewState } from "../../../common/types";
-import { mainPreload } from "../../utils/preload";
+import { Action } from "@/common/actions";
+import { ViewState } from "@/common/types";
+import { mainPreload } from "@/web/utils/preload";
 
 export const stateJotai = atom<ViewState>({
   overlay: { servers: [], selectedServer: "" },

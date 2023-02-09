@@ -4,12 +4,12 @@ import { overlaySelectServerJotai } from "./utils/overlaySelectServerJotai";
 import { css } from "@emotion/react";
 import { actions } from "../../common/actions";
 import { useDispatch, useSelector } from "./utils/stateJotai";
-import { overlaySelector } from "./utils/selector";
+import { overlaySelectors } from "./utils/selectors";
 
 export default function OverlaySelectServer() {
   const [overlaySelectServer, setOverlay] = useAtom(overlaySelectServerJotai);
-  const servers = useSelector(overlaySelector.servers);
-  const selectedServer = useSelector(overlaySelector.selectedServer);
+  const servers = useSelector(overlaySelectors.servers);
+  const selectedServer = useSelector(overlaySelectors.selectedServer);
   const dispatch = useDispatch();
   return (
     <Overlay in={overlaySelectServer}>
