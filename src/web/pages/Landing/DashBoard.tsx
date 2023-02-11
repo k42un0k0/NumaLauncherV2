@@ -1,14 +1,14 @@
 import { css } from "@emotion/react";
-import { useSetAtom } from "jotai";
-import { overlaySelectServerJotai } from "../utils/overlaySelectServerJotai";
 import SealCircle from "../../../assets/images/SealCircle.svg";
 import Statuses from "./DashBoard/Statuses";
 import Menu from "./DashBoard/Menu";
+import { useSetAtom } from "jotai";
+import { overlaySelectServerJotai } from "../utils/overlaySelectServerJotai";
 
-type Props = { in: boolean };
-export default function DashBoard({ in: inProp }: Props) {
+export default function DashBoard() {
+  const setOverlay = useSetAtom(overlaySelectServerJotai);
   return (
-    <div css={[styles.container, inProp && styles.containerActive]}>
+    <div css={[styles.container]}>
       <div css={styles.main}>
         <img src={SealCircle} css={styles.logo} />
         <Menu />
@@ -21,7 +21,7 @@ export default function DashBoard({ in: inProp }: Props) {
             <div>▲ゲーム開始</div>
           </button>
           <div></div>
-          <button>
+          <button onClick={() => setOverlay(true)}>
             <div>&#8226; Modパックが選択されていません</div>
             <div>▲Modパック/バージョン選択</div>
           </button>
@@ -37,11 +37,6 @@ const styles = {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: 2s ease;
-    transform: translateY(0);
-  `,
-  containerActive: css`
-    transform: translateY(-200%);
   `,
   main: css`
     display: flex;

@@ -11,6 +11,6 @@ export default {
   component: Overlay,
 };
 
-const Template = (_: ComponentProps<typeof Overlay>) => <Overlay />;
+const Template = (props: ComponentProps<typeof Overlay>) => <Overlay {...props} />;
 
 export const Primary: ComponentStory<typeof Overlay> = Template.bind({});

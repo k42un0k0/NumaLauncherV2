@@ -30,7 +30,6 @@ const styles = {
     position: relative;
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
   `,
   name: css`
     position: absolute;

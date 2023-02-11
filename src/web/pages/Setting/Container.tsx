@@ -18,6 +18,7 @@ const styles = {
     height: calc(100vh - 24px);
     background-color: rgba(0, 0, 0, 0.5);
     display: flex;
+    padding: 40px 0;
   `,
   pageContainer: css`
     height: 100%;
@@ -28,7 +29,6 @@ const styles = {
     }
     ::-webkit-scrollbar-thumb {
       background-color: #ccc;
-      min-height: 32px;
     }
   `,
 };

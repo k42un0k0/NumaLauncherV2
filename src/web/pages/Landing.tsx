@@ -1,39 +1,54 @@
 import { css } from "@emotion/react";
 import { useState } from "react";
 import DashBoard from "./Landing/DashBoard";
+import EditSkin from "./Landing/EditSkin";
+import News from "./Landing/News";
 import Skin from "./Landing/Skin";
 
 export default function Home() {
-  const [skin, setSkin] = useState(false);
+  const [active, setSkinActive] = useState(false);
+  const [open, setOpen] = useState(true);
   return (
     <div css={styles.root}>
-      <button
-        css={[styles.skinButton, skin && styles.skinButtonActive]}
-        onClick={() => {
-          setSkin(!skin);
-        }}
-      >
-        <div>
-          <svg
-            viewBox="0 0 24.87 13.97"
-            css={css`
-              height: 11px;
-            `}
-          >
-            <polyline
-              style={{
-                fill: "none",
-                stroke: "#FFF",
-                strokeWidth: "2px",
-              }}
-              points="0.71 13.26 12.56 1.41 24.16 13.02"
-            />
-          </svg>
-        </div>
-        <div>SKIN</div>
-      </button>
-      <DashBoard in={skin} />
-      <Skin in={skin} />
+      <div css={[styles.dashboard, active && styles.dashboardDeactive]}>
+        <DashBoard />
+      </div>
+      <div css={[styles.hide, active && styles.active]}>
+        <Skin onClickGear={() => setOpen(true)} />
+      </div>
+      <div css={[styles.skinButtonContainer, active && styles.skinButtonContainerActive]}>
+        <button
+          css={[styles.skinButton]}
+          onClick={() => {
+            setSkinActive(!active);
+          }}
+        >
+          <div>
+            <svg
+              viewBox="0 0 24.87 13.97"
+              css={css`
+                height: 11px;
+              `}
+            >
+              <polyline
+                style={{
+                  fill: "none",
+                  stroke: "#FFF",
+                  strokeWidth: "2px",
+                }}
+                points="0.71 13.26 12.56 1.41 24.16 13.02"
+              />
+            </svg>
+          </div>
+          <div>SKIN</div>
+        </button>
+      </div>
+      <div css={[styles.hide, active && styles.active]}>
+        <News open={open} onClickClose={() => setOpen(false)} />
+      </div>
+      <div css={[styles.skinform]}>
+        <EditSkin open={false} onClickClose={() => setOpen(false)} />
+      </div>
     </div>
   );
 }
@@ -43,20 +58,43 @@ const styles = {
     position: relative;
     overflow: hidden;
   `,
-  skinButton: css`
-    color: white;
-    border: none;
-    background-color: transparent;
-    z-index: 1;
+  skinButtonContainer: css`
     position: absolute;
     bottom: 10%;
     left: 50%;
     transform: translateX(-50%);
     transition: 2s ease;
+  `,
+  skinButtonContainerActive: css`
+    bottom: 90%;
+  `,
+  skinButton: css`
+    color: white;
+    border: none;
+    background-color: transparent;
     letter-spacing: 2px;
     font-size: 11px;
   `,
-  skinButtonActive: css`
-    bottom: 90%;
+  skinform: css`
+    position: absolute;
+    height: 100%;
+    top: 0;
+  `,
+  hide: css`
+    position: absolute;
+    height: 100%;
+    transition: 2s ease;
+    transform: translateY(0);
+  `,
+  active: css`
+    transform: translateY(-100%);
+  `,
+  dashboard: css`
+    height: 100%;
+    transition: 2s ease;
+    transform: translateY(0);
+  `,
+  dashboardDeactive: css`
+    transform: translateY(-200%);
   `,
 };

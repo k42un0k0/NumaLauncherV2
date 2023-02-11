@@ -66,7 +66,7 @@ const styles = {
   root: css`
     display: flex;
     flex-direction: column;
-    padding: 40px 80px;
+    padding: 0px 80px;
   `,
   heading: css`
     font-size: 1.25rem;
