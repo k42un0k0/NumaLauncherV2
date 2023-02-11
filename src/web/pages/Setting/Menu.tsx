@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import { useAtom } from "jotai";
 import { usePageMove } from "../utils/pageJotai";
-import { settingJotai } from "./settingJotai";
+import { settingJotai } from "./utils/settingJotai";
 
 export default function Menu() {
   const [settting, setSetting] = useAtom(settingJotai);

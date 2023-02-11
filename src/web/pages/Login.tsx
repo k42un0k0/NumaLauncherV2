@@ -1,10 +1,11 @@
 import { css, keyframes } from "@emotion/react";
 import { useEffect, useState } from "react";
-import { mainPreload } from "../utils/preload";
 import { usePageMove } from "./utils/pageJotai";
 import SealCircle from "../../assets/images/SealCircle.svg";
 import Overlay from "./components/Overlay";
+import { useMainPreload } from "../utils/preload";
 export default function Login() {
+  const mainPreload = useMainPreload();
   const [open, setOpen] = useState(false);
   const pageMove = usePageMove();
   useEffect(() => {
@@ -23,17 +24,7 @@ export default function Login() {
   return (
     <div css={styles.root}>
       <div css={[styles.main.root, open && styles.main.rootOpenOverlay]}>
-        {/* {selectedUUID && (
-          <button
-            onClick={() => {
-              pageMove.setting();
-            }}
-          >
-            <div>X</div>
-            <span>Cancel</span>
-          </button>
-        )} */}
-        <img src={SealCircle} />
+        <img src={SealCircle} css={styles.image} />
         <div>↓ CLICK HERE ! ↓</div>
         <button
           onClick={() => {
@@ -67,16 +58,19 @@ const animations = {
   spin: keyframes`
   0% {
     transform: rotate(0deg);
-}
-100% {
-    transform: rotate(360deg);
-}
+  }
+  100% {
+      transform: rotate(360deg);
+  }
   `,
 };
 const styles = {
   root: css`
     height: calc(100vh - 24px);
     background-color: rgba(0, 0, 0, 0.5);
+    display:flex; 
+    align-items:center;
+    justify-content:center:
   `,
   main: {
     root: css`
@@ -86,6 +80,11 @@ const styles = {
       filter: blur(3px) contrast(0.9) brightness(1);
     `,
   },
+  image: css`
+    height: 125px;
+    width: 125px;
+    margin-bottom: 20px;
+  `,
   overlay: {
     container: css``,
     loader: css`

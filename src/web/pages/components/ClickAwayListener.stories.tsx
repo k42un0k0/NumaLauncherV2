@@ -18,6 +18,3 @@ const Template = (props: ComponentProps<typeof ClickAwayListener>) => (
 );
 
 export const Primary: ComponentStory<typeof ClickAwayListener> = Template.bind({});
-Primary.argTypes = {
-  onClickAway: { action: "clicked" },
-};

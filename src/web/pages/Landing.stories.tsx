@@ -1,29 +1,32 @@
 import { withMainWindow } from "@/_storybook/withMainWindow";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
-import withJotai from "storybook-addon-jotai";
-import Setting from "./Setting";
-import { settingJotai } from "./Setting/utils/settingJotai";
-
+import Landing from "./Landing";
+import { withJotai } from "storybook-addon-jotai";
+import { stateJotai } from "./utils/stateJotai";
 export default {
   /* 👇 The title prop is optional.
    * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
    * to learn how to generate automatic titles
    */
-  title: "Setting",
-  component: Setting,
+  title: "Landing",
+  component: Landing,
   decorators: [withJotai, withMainWindow],
-} as ComponentMeta<typeof Setting>;
+} as ComponentMeta<typeof Landing>;
 
-const Template = () => <Setting />;
+const Template = () => <Landing />;
 
-export const Primary: ComponentStory<typeof Setting> = Template.bind({});
+export const Primary: ComponentStory<typeof Landing> = Template.bind({});
 Primary.parameters = {
   jotai: {
     atoms: {
-      setting: settingJotai,
+      state: stateJotai,
     },
     values: {
-      setting: "account",
+      state: {
+        landing: {
+          account: {},
+        },
+      },
     },
   },
 };

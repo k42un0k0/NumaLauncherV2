@@ -1,5 +1,5 @@
 declare interface Window {
-  main: unknown;
+  main: any;
 }
 
 declare namespace NodeJS {

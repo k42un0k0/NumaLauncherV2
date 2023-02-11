@@ -1,12 +1,8 @@
 import Frame from "@/web/pages/components/Frame";
 import { css } from "@emotion/react";
-import { ReactNode } from "react";
 import bg from "../assets/images/backgrounds/1.jpg";
 
-type Props = {
-  children: ReactNode;
-};
-export default function MainWindow({ children }: Props) {
+export function withMainWindow(Story: any) {
   return (
     <div
       css={css`
@@ -24,7 +20,7 @@ export default function MainWindow({ children }: Props) {
           background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.65) 100%);
         `}
       >
-        {children}
+        <Story />
       </div>
     </div>
   );

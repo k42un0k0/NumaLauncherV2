@@ -3,6 +3,7 @@ import { css, Global } from "@emotion/react";
 import AvenirBook from "../assets/fonts/Avenir-Book.ttf";
 import AvenirMedium from "../assets/fonts/Avenir-Medium.ttf";
 import Ringbearer from "../assets/fonts/Ringbearer.ttf";
+import { MainPreloadProvider } from "./utils/preload";
 export const App = () => {
   return (
     <>
@@ -39,7 +40,9 @@ export const App = () => {
           }
         `}
       />
-      <Main />
+      <MainPreloadProvider value={window.main}>
+        <Main />
+      </MainPreloadProvider>
     </>
   );
 };

@@ -10,7 +10,9 @@
     "strict": true,
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "allowJs": true,
+    "resolveJsonModule": true
   },
   "ts-node": {
     "compilerOptions": {
