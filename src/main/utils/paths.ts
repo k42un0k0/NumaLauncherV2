@@ -1,4 +1,4 @@
-import electron from "electron";
+import electron, { app } from "electron";
 import path from "path";
 
 interface GenPathsValue {
@@ -79,6 +79,21 @@ export function genPaths<T extends GenPathsValue>(value: T, rootPaths: RootPaths
   return result as Paths<T>;
 }
 
+function getLauncherSkinPath() {
+  const appPath = app.getPath("appData");
+  const homePath = app.getPath("home");
+  switch (process.platform) {
+    case "win32":
+      return path.join(appPath, ".minecraft");
+    case "darwin":
+      return path.join(appPath, "minecraft");
+    case "linux":
+      return path.join(homePath, ".minecraft");
+    default:
+      throw Error();
+  }
+}
+
 export const sysRoot =
   process.env.APPDATA ||
   (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support" : (process.env.HOME as string));
@@ -92,10 +107,16 @@ export const paths = genPaths(
       distroFile: "distribution.json",
     },
     preloadFile: path.resolve(__dirname, "preload.js"),
+    minecraftLauncherData: {
+      numaSkinFile: "numa_skins.json",
+      originSkinFile: "launcher_custom_skins.json",
+      skinSettingFile: "skinSetting.json",
+    },
   },
   {
     root: __dirname,
     sysRoot: sysRoot,
     launcher: process.env.CONFIG_DIRECT_PATH || electron.app.getPath("userData"),
+    minecraftLauncherData: getLauncherSkinPath(),
   }
 );

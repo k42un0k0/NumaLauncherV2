@@ -111,6 +111,9 @@ function globalListener() {
   ipcMain.on(MainChannel.RUN_MINECRAFT, function (event) {
     return runMinecraft(event);
   });
+  ipcMain.on(MainChannel.IMPORT_OFFICIAL_SKIN_INFO, function (event) {
+    return runMinecraft(event);
+  });
   ipcMain.on(MainChannel.OPEN_SERVER_DIR, function () {
     const serv = DistroManager.getDistribution()!.getServer(ConfigManager.INSTANCE.config.selectedServer);
     const CACHE_SETTINGS_MODS_DIR = ConfigManager.getLauncherSetting().getDataDirectory().instances.$join(serv!.id);

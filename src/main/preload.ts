@@ -31,6 +31,7 @@ const preload: MainPreload = {
     return () => ipcRenderer.off(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, callback);
   },
   runMinecraft: () => ipcRenderer.invoke(MainChannel.RUN_MINECRAFT),
+  importOfficialSkinInfo: () => ipcRenderer.invoke(MainChannel.IMPORT_OFFICIAL_SKIN_INFO),
   openServerDir: () => ipcRenderer.send(MainChannel.OPEN_SERVER_DIR),
 };
 contextBridge.exposeInMainWorld("main", preload);

@@ -87,7 +87,9 @@ interface Cape {
   url: string;
 }
 // 3dview今着ているスキンの呼び出しAPI
-export async function getCurrentSkin(uuid: string) {
+export async function getCurrentSkin(
+  uuid: string
+): Promise<{ skinURL: string; model: "default" | "slim" | undefined }> {
   const response = await axios.get<GetCurrentSkinResponse>(
     `https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`
   );
@@ -99,10 +101,11 @@ export async function getCurrentSkin(uuid: string) {
   const texturesJSON = atob(base64Textures);
   const textures = JSON.parse(texturesJSON.toString()) as GetCurrentSkinResponseValue;
   const skinURL = textures.textures.SKIN.url;
-  let model = "classic";
+  let model: "default" | "slim" | undefined = "default";
   if ("metadata" in textures.textures.SKIN) {
-    model = textures.textures.SKIN.metadata.model;
+    model = textures.textures.SKIN.metadata.model as undefined | "slim";
   }
+  console.log(textures.textures.SKIN);
   return { model, skinURL };
 }
 
@@ -113,7 +116,6 @@ export async function getTextureID(uuid: string) {
     const response = await axios.get<GetCurrentSkinResponse>(
       `https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`
     );
-    console.log(response);
     let base64Textures = "";
     response.data.properties.forEach((element) => {
       if (element.name == "textures") {
@@ -132,43 +134,19 @@ export async function getTextureID(uuid: string) {
   return textureID;
 }
 
-/*----------------------
-APIへの反映 PUT
-----------------------*/
+export async function uploadSkin(variant: string, file: File, accessToken: string) {
+  const config = {
+    headers: {
+      Authorization: "Bearer " + accessToken,
+    },
+  };
 
-// 編集・追加したスキンに着替えるAPI
-// async function uploadSkin(variant, file) {
-//   await AuthManager.validateSelected();
-//   const account = ConfigManager.getAuthAccount(ConfigManager.getSelectedAccount().uuid);
-//   const config = {
-//     headers: {
-//       Authorization: "Bearer " + account.accessToken,
-//     },
-//   };
-//   try {
-//     const reader = new FileReader();
-//     reader.addEventListener(
-//       "load",
-//       function () {
-//         const skinURL = reader.result;
-//         nowSkinPreview(variant, skinURL);
-//       },
-//       false
-//     );
-//     if (file) {
-//       reader.readAsDataURL(file);
-//     }
-//   } catch (error) {
-//     console.log(error);
-//   }
-
-//   const param = new FormData();
-//   console.log("file", file);
-//   if (variant === "slim") {
-//     param.append("variant", variant);
-//   } else {
-//     param.append("variant", "classic");
-//   }
-//   param.append("file", file, "skin.png");
-//   await axios.post("https://api.minecraftservices.com/minecraft/profile/skins", param, config);
-// }
+  const param = new FormData();
+  if (variant === "slim") {
+    param.append("variant", variant);
+  } else {
+    param.append("variant", "classic");
+  }
+  param.append("file", file, "skin.png");
+  await axios.post("https://api.minecraftservices.com/minecraft/profile/skins", param, config);
+}

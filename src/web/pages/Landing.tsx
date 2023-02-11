@@ -1,20 +1,34 @@
 import { css } from "@emotion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getCurrentSkin } from "../utils/api/mojang";
 import DashBoard from "./Landing/DashBoard";
 import EditSkin from "./Landing/EditSkin";
 import News from "./Landing/News";
 import Skin from "./Landing/Skin";
+import { landingSelectors } from "./utils/selectors";
+import { useSelector } from "./utils/stateJotai";
 
 export default function Home() {
   const [active, setSkinActive] = useState(false);
   const [open, setOpen] = useState(true);
+  const account = useSelector(landingSelectors.account);
+  const [currentSkin, setCurrentSkin] = useState<{ skinURL: string; model: "default" | "slim" | undefined }>({
+    skinURL: "",
+    model: undefined,
+  });
+  useEffect(() => {
+    async function effect() {
+      setCurrentSkin(await getCurrentSkin(account!.uuid));
+    }
+    effect();
+  }, []);
   return (
     <div css={styles.root}>
       <div css={[styles.dashboard, active && styles.dashboardDeactive]}>
         <DashBoard />
       </div>
       <div css={[styles.hide, active && styles.active]}>
-        <Skin onClickGear={() => setOpen(true)} />
+        <Skin onClickGear={() => setOpen(true)} currentSkin={currentSkin} />
       </div>
       <div css={[styles.skinButtonContainer, active && styles.skinButtonContainerActive]}>
         <button

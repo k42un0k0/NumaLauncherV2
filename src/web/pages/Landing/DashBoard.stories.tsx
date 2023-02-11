@@ -1,21 +1,23 @@
-import { withMainWindow } from "@/_storybook/withMainWindow";
+import { withLandingContainer } from "@/_storybook/withLandingContainer";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
-import Landing from "./Landing";
-import { withJotai } from "storybook-addon-jotai";
-import { stateJotai } from "./utils/stateJotai";
+import { ComponentProps } from "react";
+import withJotai from "storybook-addon-jotai";
+import { stateJotai } from "../utils/stateJotai";
+import DashBoard from "./DashBoard";
+
 export default {
   /* 👇 The title prop is optional.
    * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
    * to learn how to generate automatic titles
    */
-  title: "Landing",
-  component: Landing,
-  decorators: [withJotai, withMainWindow],
-} as ComponentMeta<typeof Landing>;
+  title: "Landing/DashBoard",
+  component: DashBoard,
+  decorators: [withJotai, withLandingContainer],
+} as ComponentMeta<typeof DashBoard>;
 
-const Template = () => <Landing />;
+const Template = (_: ComponentProps<typeof DashBoard>) => <DashBoard />;
 
-export const Primary: ComponentStory<typeof Landing> = Template.bind({});
+export const Primary: ComponentStory<typeof DashBoard> = Template.bind({});
 Primary.parameters = {
   jotai: {
     atoms: {

@@ -17,6 +17,7 @@ export type MainPreload = {
   distribution: {
     load: () => Promise<void>;
   };
+  importOfficialSkinInfo: () => Promise<void>;
   runMinecraft: () => Promise<OpenMsaLoginWindowState>;
   openMSALoginWindow: () => Promise<OpenMsaLoginWindowState>;
   onCloseMSALoginWindow: (callback: (state: CloseMsaLoginWindowState) => void) => () => void;

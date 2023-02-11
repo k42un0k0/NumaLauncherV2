@@ -1,5 +1,5 @@
 import { css } from "@emotion/react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Gear from "../components/Icon/Gear";
 import { SkinViewer, WalkingAnimation } from "skinview3d";
 import { useSelector } from "../utils/stateJotai";
@@ -7,34 +7,38 @@ import { landingSelectors } from "../utils/selectors";
 import { getCurrentSkin } from "@/web/utils/api/mojang";
 type Props = {
   onClickGear: () => void;
+  currentSkin: {
+    skinURL: string;
+    model: "default" | "slim" | "auto-detect" | undefined;
+  };
 };
-export default function Skin({ onClickGear }: Props) {
-  const account = useSelector(landingSelectors.account);
+export default function Skin({ onClickGear, currentSkin }: Props) {
+  const viewer = useRef<SkinViewer>();
+
   useEffect(() => {
-    async function effect() {
-      const a = await getCurrentSkin(account!.uuid);
-      const skinViewer = new SkinViewer({
-        canvas: document.getElementById("skin_container") as HTMLCanvasElement,
-        width: 300,
-        height: 400,
-        skin: a.skinURL,
-      });
-      const skinModel = a.model == "classic" ? "default" : "slim";
-      skinViewer.loadSkin(a.skinURL, { model: skinModel });
+    const skinViewer = new SkinViewer({
+      canvas: document.getElementById("skin_container") as HTMLCanvasElement,
+      width: 300,
+      height: 400,
+      skin: currentSkin.skinURL,
+    });
 
-      // Control objects with your mouse!
-      const control = skinViewer.controls;
-      control.enableRotate = true;
-      control.enableZoom = false;
-      control.enablePan = false;
+    const control = skinViewer.controls;
+    control.enableRotate = true;
+    control.enableZoom = false;
+    control.enablePan = false;
 
-      const anime = new WalkingAnimation();
-      anime.speed = 0.55;
-      skinViewer.animation = anime;
-    }
-
-    effect();
+    const anime = new WalkingAnimation();
+    anime.speed = 0.55;
+    skinViewer.animation = anime;
+    viewer.current = skinViewer;
   }, []);
+  useEffect(() => {
+    if (!currentSkin.skinURL || !currentSkin.model) {
+      return;
+    }
+    viewer.current?.loadSkin(currentSkin.skinURL, { model: currentSkin.model });
+  }, [currentSkin]);
   return (
     <div css={styles.container}>
       <div css={styles.section}>
