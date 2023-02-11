@@ -15,15 +15,15 @@ export default function DashBoard() {
       </div>
       <div css={styles.footer}>
         <Statuses />
-        <div>
+        <div css={styles.game}>
           <button>
-            <div>PLAY</div>
-            <div>▲ゲーム開始</div>
+            <div css={styles.play}>PLAY</div>
+            <div css={styles.minimumfont}>▲ゲーム開始</div>
           </button>
-          <div></div>
-          <button onClick={() => setOverlay(true)}>
+          <div css={styles.divider}></div>
+          <button onClick={() => setOverlay(true)} css={styles.server}>
             <div>&#8226; Modパックが選択されていません</div>
-            <div>▲Modパック/バージョン選択</div>
+            <div css={styles.minimumfont}>▲Modパック/バージョン選択</div>
           </button>
         </div>
       </div>
@@ -50,5 +50,27 @@ const styles = {
   footer: css`
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    padding: 100px;
+  `,
+  game: css`
+    display: flex;
+  `,
+  divider: css`
+    height: 30px;
+    width: 2px;
+    background-color: grey;
+    margin: 0 20px;
+  `,
+  play: css`
+    font-size: 20px;
+    font-weight: bold;
+  `,
+  minimumfont: css`
+    font-size: 10px;
+    transform: scale(0.8);
+  `,
+  server: css`
+    font-size: 10px;
   `,
 };

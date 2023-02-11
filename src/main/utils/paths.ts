@@ -110,6 +110,7 @@ export const paths = genPaths(
     minecraftLauncherData: {
       numaSkinFile: "numa_skins.json",
       originSkinFile: "launcher_custom_skins.json",
+      originSkinOldFile: "launcher_skins.json",
       skinSettingFile: "skinSetting.json",
     },
   },

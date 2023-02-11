@@ -1,10 +1,7 @@
 import { css } from "@emotion/react";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Gear from "../components/Icon/Gear";
-import { SkinViewer, WalkingAnimation } from "skinview3d";
-import { useSelector } from "../utils/stateJotai";
-import { landingSelectors } from "../utils/selectors";
-import { getCurrentSkin } from "@/web/utils/api/mojang";
+import { useSkinViewer } from "./utils/useSkinViewer";
 type Props = {
   onClickGear: () => void;
   currentSkin: {
@@ -13,26 +10,7 @@ type Props = {
   };
 };
 export default function Skin({ onClickGear, currentSkin }: Props) {
-  const viewer = useRef<SkinViewer>();
-
-  useEffect(() => {
-    const skinViewer = new SkinViewer({
-      canvas: document.getElementById("skin_container") as HTMLCanvasElement,
-      width: 300,
-      height: 400,
-      skin: currentSkin.skinURL,
-    });
-
-    const control = skinViewer.controls;
-    control.enableRotate = true;
-    control.enableZoom = false;
-    control.enablePan = false;
-
-    const anime = new WalkingAnimation();
-    anime.speed = 0.55;
-    skinViewer.animation = anime;
-    viewer.current = skinViewer;
-  }, []);
+  const { viewer, ref } = useSkinViewer();
   useEffect(() => {
     if (!currentSkin.skinURL || !currentSkin.model) {
       return;
@@ -43,7 +21,7 @@ export default function Skin({ onClickGear, currentSkin }: Props) {
     <div css={styles.container}>
       <div css={styles.section}>
         <div css={styles.heading}>現在の設定</div>
-        <canvas id="skin_container"></canvas>
+        <canvas ref={ref}></canvas>
       </div>
       <div css={styles.divider}></div>
       <div css={styles.section}>
