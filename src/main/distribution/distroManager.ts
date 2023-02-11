@@ -2,7 +2,11 @@ import axios from "axios";
 import fs from "fs-extra";
 import { ConfigManager } from "../config/configManager";
 import { paths } from "../utils/paths";
-import { DistroIndex, Server, Module, Required, Artifact } from "./classes";
+import { DistroIndex } from "./distroIndex";
+import { Artifact } from "./artifact";
+import { Required } from "./required";
+import { Module } from "./module";
+import { Server } from "./server";
 import { DistroJson, ModuleJson } from "./json";
 
 export class DistroManager {

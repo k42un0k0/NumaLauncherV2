@@ -5,7 +5,8 @@ import os from "os";
 import path from "path";
 
 import { ConfigManager } from "./config/configManager";
-import { Module, Server } from "./distribution/classes";
+import { Module } from "./distribution/module";
+import { Server } from "./distribution/server";
 import { Types } from "./distribution/constatnts";
 import { ForgeData112 } from "./versionManifest/forgeData112";
 import { ForgeData113 } from "./versionManifest/forgeData113";

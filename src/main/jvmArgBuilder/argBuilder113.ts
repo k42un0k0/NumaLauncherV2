@@ -1,7 +1,7 @@
 import os from "os";
 import path from "path";
 import { ConfigManager } from "../config/configManager";
-import { Server } from "../distribution/classes";
+import { Server } from "../distribution/server";
 import { ForgeData113 } from "../versionManifest/forgeData113";
 import { AuthAccount } from "../config/msAccount";
 import { mojangFriendlyOS } from "../utils/util";

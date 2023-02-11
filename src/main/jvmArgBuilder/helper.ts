@@ -1,6 +1,7 @@
 import { ConfigManager } from "../config/configManager";
 import { ModSetting } from "../config/modSetting";
-import { Module, Server } from "../distribution/classes";
+import { Module } from "../distribution/module";
+import { Server } from "../distribution/server";
 import { Types } from "../distribution/constatnts";
 import { mojangFriendlyOS } from "../utils/util";
 import { VersionData113 } from "../versionManifest/versionData113";

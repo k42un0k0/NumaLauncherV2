@@ -8,7 +8,8 @@ import { VersionData113 } from "../versionManifest/versionData113";
 import fs from "fs-extra";
 import { validateRules } from "./helper";
 import AdmZip from "adm-zip";
-import { Server, Module } from "../distribution/classes";
+import { Module } from "../distribution/module";
+import { Server } from "../distribution/server";
 import { Types } from "../distribution/constatnts";
 /**
  * Resolve the full classpath argument list for this process. This method will resolve all Mojang-declared

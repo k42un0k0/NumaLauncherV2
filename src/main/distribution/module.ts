@@ -1,32 +1,9 @@
 import path from "path";
 import { ConfigManager } from "../config/configManager";
-import { ArtifactJson, DiscordJson, DiscordJson2, DistroJson, ManualJson, ModuleJson, ServerJson } from "./json";
+import { ModuleJson } from "./json";
 import { Types } from "./constatnts";
-
-export class DistroIndex implements DistroJson {
-  mainServer: string;
-  constructor(public version: string, public rss: string, public discord: DiscordJson, public servers: Server[]) {
-    this.mainServer = this.servers.find((server) => server.mainServer)?.id || this.servers[0]?.id;
-  }
-  getServer(serverID: string) {
-    return this.servers.find((server) => server.id === serverID);
-  }
-}
-export class Server implements ServerJson {
-  constructor(
-    public id: string,
-    public name: string,
-    public description: string,
-    public version: string,
-    public address: string,
-    public minecraftVersion: string,
-    public discord: DiscordJson2,
-    public mainServer: boolean,
-    public autoconnect: boolean,
-    public modules: Module[],
-    public icon?: string
-  ) {}
-}
+import { Artifact } from "./artifact";
+import { Required } from "./required";
 
 export class Module implements ModuleJson {
   artifactExt: string;
@@ -104,21 +81,4 @@ export class Module implements ModuleJson {
         return ConfigManager.getLauncherSetting().getDataDirectory().instances.$join(serverid, pth);
     }
   }
-}
-export class Required {
-  value: boolean;
-  def: boolean;
-  constructor(value?: boolean, def?: boolean) {
-    this.value = value == null ? true : value;
-    this.def = def == null ? true : def;
-  }
-}
-export class Artifact implements ArtifactJson {
-  constructor(
-    public size: number,
-    public MD5: string,
-    public url: string,
-    public manual?: ManualJson,
-    public path?: string
-  ) {}
 }

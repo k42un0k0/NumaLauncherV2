@@ -1,6 +1,6 @@
 import path from "path";
 import { ConfigManager } from "../config/configManager";
-import { Server } from "../distribution/classes";
+import { Server } from "../distribution/server";
 import { ForgeData112 } from "../versionManifest/forgeData112";
 import { AuthAccount } from "../config/msAccount";
 import { _lteMinorVersion } from "../utils/util";
