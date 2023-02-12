@@ -10,6 +10,7 @@ export type ViewState = {
   };
   landing: {
     account?: AuthAccount;
+    server?: Server;
   };
   setting: {
     account: {

@@ -4,9 +4,11 @@ import Statuses from "./DashBoard/Statuses";
 import Menu from "./DashBoard/Menu";
 import { useSetAtom } from "jotai";
 import { overlaySelectServerJotai } from "../utils/overlaySelectServerJotai";
+import { useMainPreload } from "@/web/utils/preload";
 
 export default function DashBoard() {
   const setOverlay = useSetAtom(overlaySelectServerJotai);
+  const mainPreload = useMainPreload();
   return (
     <div css={[styles.container]}>
       <div css={styles.main}>
@@ -16,7 +18,7 @@ export default function DashBoard() {
       <div css={styles.footer}>
         <Statuses />
         <div css={styles.game}>
-          <button>
+          <button onClick={() => mainPreload.runMinecraft()}>
             <div css={styles.play}>PLAY</div>
             <div css={styles.minimumfont}>▲ゲーム開始</div>
           </button>

@@ -66,6 +66,8 @@ export function classpathArg(
   // maven identifier will override the mojang ones.
   // Ex. 1.7.10 forge overrides mojang's guava with newer version.
   const finalLibs = [...mojangLibs, ...servLibs];
+  console.log("adsfasdfasdfa", mojangLibs);
+  console.log("we8ufewlfjlej;", servLibs);
   cpArgs = cpArgs.concat(finalLibs);
 
   _processClassPathList(cpArgs);
@@ -97,22 +99,28 @@ function _resolveMojangLibraries(
   versionData: VersionData112 | VersionData113,
   libPath: string
 ) {
-  const libs: string[] = [];
+  const libs = [];
 
   const libArr = versionData.libraries;
   fs.ensureDirSync(tempNativePath);
   for (let i = 0; i < libArr.length; i++) {
     const lib = libArr[i];
-    if ("natives" in lib && validateRules(lib.rules, lib.natives)) {
+    console.log(lib);
+    // @ts-expect-error aaaa
+    if (validateRules(lib.rules, lib.natives)) {
+      // @ts-expect-error aaa
       if (lib.natives == null) {
         const dlInfo = lib.downloads;
         const artifact = dlInfo.artifact;
         const to = path.join(libPath, artifact.path);
+        const versionIndependentId = lib.name.substring(0, lib.name.lastIndexOf(":"));
         libs.push(to);
       } else {
         // Extract the native library.
+        // @ts-expect-error aaa
         const exclusionArr = lib.extract != null ? lib.extract.exclude : ["META-INF/"];
         const artifact =
+          // @ts-expect-error aaa
           lib.downloads.classifiers[lib.natives[mojangFriendlyOS()]!.replace("${arch}", process.arch.replace("x", ""))];
 
         // Location of native zip.
@@ -128,6 +136,7 @@ function _resolveMojangLibraries(
           let shouldExclude = false;
 
           // Exclude noted files.
+          // @ts-expect-error aaa
           exclusionArr.forEach(function (exclusion) {
             if (fileName.indexOf(exclusion) > -1) {
               shouldExclude = true;
@@ -136,11 +145,7 @@ function _resolveMojangLibraries(
 
           // Extract the file.
           if (!shouldExclude) {
-            fs.writeFile(path.join(tempNativePath, fileName), zipEntries[i].getData(), (err) => {
-              if (err) {
-                // logger.error("Error while extracting native library:", err);
-              }
-            });
+            fs.writeFileSync(path.join(tempNativePath, fileName), zipEntries[i].getData());
           }
         }
       }

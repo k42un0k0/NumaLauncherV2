@@ -83,7 +83,7 @@ export class ArgBuilder113 {
         return acc.concat(replaceJVMArgument(arg, valueAfterReplace));
       } else if (typeof arg === "object" && arg.rules != null) {
         // validate all rule
-        const validateAllRule = (arg.rules as VersionData113Rules[]).reduce((acc, rule) => {
+        const validateAllRule = (arg.rules as VersionData113Rules[]).every((rule) => {
           if (
             "features" in rule &&
             rule.features.has_custom_resolution != null &&
@@ -93,8 +93,8 @@ export class ArgBuilder113 {
               arg.value = ["--fullscreen", "true"];
             }
           }
-          return acc && validateRule(rule);
-        }, true);
+          return validateRule(rule);
+        });
         if (validateAllRule) {
           if (typeof arg.value == "string") {
             return acc.concat(replaceJVMArgument(arg.value, valueAfterReplace));
@@ -132,7 +132,9 @@ function validateRule(rule: VersionData113Rules) {
         return true;
       }
     } else {
-      return true;
+      if (rule.action === "disallow") {
+        return true;
+      }
     }
   } else if ("features" in rule && rule.features != null) {
     // We don't have many 'features' in the index at the moment.
@@ -143,7 +145,7 @@ function validateRule(rule: VersionData113Rules) {
   }
   return false;
 }
-function isAutoconnectBroken(forgeVersion: string): boolean {
+export function isAutoconnectBroken(forgeVersion: string): boolean {
   const minWorking = [31, 2, 15];
   const verSplit = forgeVersion.split(".").map((v) => Number(v));
 

@@ -6,7 +6,7 @@ import { DistroManager } from "./distribution/distroManager";
 import { getVersionUrl } from "./api/mojang";
 import fetch from "node-fetch";
 import crypto from "crypto";
-import { IpcMainEvent, WebContents } from "electron";
+import { app, IpcMainInvokeEvent, WebContents } from "electron";
 import { VersionData112 } from "./versionManifest/versionData112";
 import { VersionData113 } from "./versionManifest/versionData113";
 import { forEachOfLimit, getJDKPath, isDev, isForgeGradle3, isMac, mojangFriendlyOS } from "./utils/util";
@@ -18,8 +18,8 @@ import childProcess from "child_process";
 import { Module } from "./distribution/module";
 import { Server } from "./distribution/server";
 import { Types } from "./distribution/constatnts";
-import { ProcessBuilder } from "./processbuilder";
 import electron from "electron";
+import ProcessBuilder from "./processbuilder";
 
 async function loadVersionData(version: string) {
   const versionPath = ConfigManager.getLauncherSetting().getDataDirectory().common.versions.$join(version);
@@ -140,7 +140,7 @@ function _validateLocal(filePath: string, algo: string, hash: string): boolean {
 function _calculateHash(buf: Buffer, algo: string) {
   return crypto.createHash(algo).update(buf).digest("hex");
 }
-export async function runMinecraft(event: IpcMainEvent) {
+export async function runMinecraft(event: IpcMainInvokeEvent) {
   const distribution = DistroManager.INSTANCE.data!;
   const selectedServer = ConfigManager.INSTANCE.config.selectedServer;
   const server = distribution.servers.find((server) => server.id == selectedServer) || distribution.servers[0];
@@ -389,16 +389,16 @@ async function _installForgeWithCLI(installerExec: string, workDir: string, java
 
     let libPath;
     if (isDev) {
-      libPath = path.join(process.cwd(), "libraries", "java", "ForgeCLI.jar");
+      libPath = path.join(app.getAppPath(), "libraries", "java", "ForgeCLI.jar");
     } else {
       if (isMac) {
         // process.cwdでは正常にパスが取得できないので__dirnameで対応
-        libPath = path.join(__dirname, "../../../..", "libraries", "java", "ForgeCLI.jar");
+        libPath = path.join(app.getAppPath(), "libraries", "java", "ForgeCLI.jar");
       } else {
-        libPath = path.join(process.cwd(), "resources", "libraries", "java", "ForgeCLI.jar");
+        libPath = path.join(app.getAppPath(), "libraries", "java", "ForgeCLI.jar");
       }
     }
-
+    console.log(libPath, installerExec, workDir);
     const child = childProcess.spawn(javaExecutable, [
       "-jar",
       libPath,

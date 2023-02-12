@@ -34,8 +34,8 @@ export class LauncherSetting {
         },
       },
       {
-        common: paths.sysRoot.$join(this.dataDirectory, "common"),
-        instances: paths.sysRoot.$join(this.dataDirectory, "instances"),
+        common: path.join(this.dataDirectory, "common"),
+        instances: path.join(this.dataDirectory, "instances"),
       }
     );
   }

@@ -4,7 +4,7 @@ import os from "os";
 import { DistroManager } from "../distribution/distroManager";
 import { ForgeData112 } from "../versionManifest/forgeData112";
 import { ForgeData113 } from "../versionManifest/forgeData113";
-import { BrowserWindow } from "electron";
+import { app, BrowserWindow } from "electron";
 export function mojangFriendlyOS() {
   if (isMac) {
     return "osx";
@@ -129,7 +129,7 @@ function getBasePath(): [SanitizedOS, MidwayPath, FileName, BasePath] {
   }
   if (isMac) {
     const sanitizedOS = isAappleSilicon ? "mac-apple" : "mac-intel";
-    const basePath = isDev ? path.join(__dirname, "../../..", "jdk") : path.join(__dirname, "../../../..", "jdk");
+    const basePath = isDev ? path.join(app.getAppPath(), "jdk") : path.join(app.getAppPath(), "jdk");
     return [sanitizedOS, path.join("Contents", "Home", "bin"), "java", basePath];
   }
   if (isLinux) return ["linux", "bin", "java", path.join(process.cwd(), "resources", "jdk")];
