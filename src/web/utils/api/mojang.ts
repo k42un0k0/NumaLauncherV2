@@ -105,7 +105,6 @@ export async function getCurrentSkin(
   if ("metadata" in textures.textures.SKIN) {
     model = textures.textures.SKIN.metadata.model as undefined | "slim";
   }
-  console.log(textures.textures.SKIN);
   return { model, skinURL };
 }
 

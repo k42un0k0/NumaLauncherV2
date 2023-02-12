@@ -21,7 +21,6 @@ export default function Setting() {
 }
 
 function settingComp(setting: SettingJotai) {
-  console.log(setting);
   switch (setting) {
     case "account":
       return (

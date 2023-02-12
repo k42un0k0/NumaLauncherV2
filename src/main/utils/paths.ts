@@ -44,8 +44,7 @@ function genPathFunc(child: GenPathsValue, parentPath: string) {
 }
 function genPath<T extends GenPathsValue>(value: T, currentPath: string): Path {
   const result = {} as Record<keyof T, unknown>;
-  const keys = Object.keys(value);
-  keys.forEach((key: keyof typeof value) => {
+  Object.keys(value).forEach((key: keyof typeof value) => {
     const v = value[key];
     if (typeof v == "string") {
       result[key] = path.join(currentPath, v);
@@ -61,17 +60,15 @@ function genPath<T extends GenPathsValue>(value: T, currentPath: string): Path {
 }
 export function genPaths<T extends GenPathsValue>(value: T, rootPaths: RootPaths<T>): Paths<T> {
   const result = {} as Record<keyof T, unknown>;
-  const keys = Object.keys(value);
-  keys.forEach((key: keyof typeof value) => {
+  Object.keys(value).forEach((key: keyof typeof value) => {
     const v = value[key];
-    let rootPath = rootPaths[key] || "";
-    rootPath = rootPath ? path.join(rootPath) : "";
+    const rootPath = rootPaths[key] || "";
     if (typeof v == "string") {
-      result[key] = rootPath || path.join(v);
+      result[key] = rootPath ? path.join(rootPath) : path.join(v);
       return;
     }
     if (typeof v == "function") {
-      result[key] = genPathFunc(v(), path.join(rootPath));
+      result[key] = genPathFunc(v(), rootPath);
       return;
     }
     result[key] = genPath(v, rootPath);

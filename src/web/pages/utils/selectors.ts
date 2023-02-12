@@ -17,6 +17,7 @@ export const settingSelectors = {
   minecraft: createSelector(selectors.setting, (state) => state.minecraft),
   java: createSelector(selectors.setting, (state) => state.java),
   launcher: createSelector(selectors.setting, (state) => state.launcher),
+  mod: createSelector(selectors.setting, (state) => state.mod),
 };
 
 export const overlaySelectors = {

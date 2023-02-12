@@ -3,7 +3,6 @@ import { GameSetting, gameSettingArgs } from "./gameSetting";
 import { LauncherSetting, launcherSettingArgs } from "./launcherSetting";
 import { AuthAccount } from "./msAccount";
 import { ModSetting, modSettingArgs } from "./modSetting";
-import { ToPlain } from "../utils/object";
 
 export const configArgs = [
   "selectedUUID",
@@ -26,8 +25,14 @@ export const configArgs = [
       },
       {
         key: "mods",
-        cls: ModSetting,
-        args: modSettingArgs,
+        cls: Array,
+        args: [
+          {
+            key: "",
+            cls: ModSetting,
+            args: modSettingArgs,
+          },
+        ],
       },
     ],
   },
@@ -53,5 +58,3 @@ export class Config {
     public setting: { java: JavaSetting; game: GameSetting; launcher: LauncherSetting; mods: ModSetting[] }
   ) {}
 }
-
-export type ConfigJSON = ToPlain<Config>;

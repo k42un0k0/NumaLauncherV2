@@ -14,9 +14,8 @@ import { createViewer } from "./utils/useSkinViewer";
 type Props = {
   open: boolean;
   onClickClose: () => void;
-  skinJson: SkinJSON;
 };
-export default function EditSkin({ open, onClickClose, skinJson }: Props) {
+export default function EditSkin({ open, onClickClose }: Props) {
   const viewer = useRef<SkinViewer>();
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {

@@ -1,4 +1,3 @@
-import { withMainWindow } from "@/_storybook/withMainWindow";
 import { withSettingContainer } from "@/_storybook/withSettingContainer";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import withJotai from "storybook-addon-jotai";

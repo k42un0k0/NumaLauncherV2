@@ -32,8 +32,8 @@ export function _processAutoConnectArg(server: Server): string[] {
 }
 
 export function resolveModConfiguration(modCfg: ModSetting, mdls: Module[]) {
-  let fMods: Module[] = [];
-  let lMods: Module[] = [];
+  const fMods: Module[] = [];
+  const lMods: Module[] = [];
 
   mdls.forEach((mdl) => {
     const type = mdl.type;
@@ -41,14 +41,6 @@ export function resolveModConfiguration(modCfg: ModSetting, mdls: Module[]) {
       const unnecessary = !mdl.required?.value;
       const enabled = modCfg.isModEnabled(mdl.versionLessID, mdl.required.def);
       if (!unnecessary || (unnecessary && enabled)) {
-        if (mdl.subModules) {
-          const v = resolveModConfiguration(modCfg.subModules[mdl.versionLessID], mdl.subModules);
-          fMods = fMods.concat(v.fMods);
-          lMods = lMods.concat(v.lMods);
-          if (mdl.type === Types.LiteLoader) {
-            return;
-          }
-        }
         if (mdl.type === Types.ForgeMod) {
           fMods.push(mdl);
         } else {

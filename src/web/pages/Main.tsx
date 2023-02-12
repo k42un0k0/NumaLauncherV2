@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { SwitchTransition } from "react-transition-group";
 import Fade from "./components/Fade";
 import { mainPreload } from "../utils/preload";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { pageJotai, PageJotai, usePageMove } from "./utils/pageJotai";
 import Landing from "./Landing";
 import Login from "./Login";
@@ -14,6 +14,7 @@ import Splash from "./Splash";
 import OverlaySelectServer from "./OverlaySelectServer";
 import { stateJotai } from "./utils/stateJotai";
 import { landingSelectors } from "./utils/selectors";
+import { overlaySelectServerJotai } from "./utils/overlaySelectServerJotai";
 
 export const Main = () => {
   const setState = useSetAtom(stateJotai);
@@ -21,10 +22,10 @@ export const Main = () => {
   const pageMove = usePageMove();
   useEffect(() => {
     async function effect() {
-      await Promise.all([mainPreload.config.load(), mainPreload.distribution.load()]);
+      await mainPreload.config.load();
+      await mainPreload.distribution.load();
       const state = await mainPreload.view.getState();
       setState(state);
-      console.log(state);
       if (landingSelectors.account(state)) {
         pageMove.home();
         return;
@@ -34,12 +35,15 @@ export const Main = () => {
     effect();
   }, []);
   const [page] = useAtom(pageJotai);
+  const overlay = useAtomValue(overlaySelectServerJotai);
   return (
     <div css={[styles.root]}>
       <div css={styles.container}>
         <Frame />
         <div css={styles.main}>
-          <SwitchTransition>{mainComp(page)}</SwitchTransition>
+          <div css={overlay && styles.blur}>
+            <SwitchTransition>{mainComp(page)}</SwitchTransition>
+          </div>
           <OverlaySelectServer />
         </div>
       </div>
@@ -90,5 +94,8 @@ const styles = {
     position: relative;
     height: calc(100% - 24px);
     background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.65) 100%);
+  `,
+  blur: css`
+    filter: blur(3px) contrast(0.9) brightness(1);
   `,
 };

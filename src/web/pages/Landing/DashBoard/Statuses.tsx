@@ -8,7 +8,6 @@ export default function Statuses() {
   const essential = statuses.filter((status) => status.essential);
   const nonessential = statuses.filter((status) => !status.essential);
   const [open, setOpen] = useState(false);
-  console.log(open);
   return (
     <div css={styles.root}>
       <div onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>

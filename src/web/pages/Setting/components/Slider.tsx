@@ -59,14 +59,7 @@ export default function Slider({ defaultValue, max, min, step = 1 }: Props) {
         css={styles.thumb}
         onMouseDown={onMouseDown}
       >
-        <input
-          type="range"
-          value={value}
-          css={styles.input}
-          onFocus={() => {
-            console.log("focus");
-          }}
-        />
+        <input type="range" value={value} css={styles.input} />
       </div>
     </div>
   );

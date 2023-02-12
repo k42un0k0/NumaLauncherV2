@@ -25,6 +25,7 @@ export const stateJotai = atom<ViewState>({
       allowPrerelease: false,
       dataDirectory: "",
     },
+    mod: { required: [], option: [], selectedServer: "" },
   },
 });
 

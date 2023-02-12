@@ -141,7 +141,7 @@ function _calculateHash(buf: Buffer, algo: string) {
   return crypto.createHash(algo).update(buf).digest("hex");
 }
 export async function runMinecraft(event: IpcMainEvent) {
-  const distribution = await DistroManager.INSTANCE.load();
+  const distribution = DistroManager.INSTANCE.data!;
   const selectedServer = ConfigManager.INSTANCE.config.selectedServer;
   const server = distribution.servers.find((server) => server.id == selectedServer) || distribution.servers[0];
   if (!server) {

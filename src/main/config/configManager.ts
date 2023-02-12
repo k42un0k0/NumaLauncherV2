@@ -1,8 +1,9 @@
 import { AuthAccount } from "./msAccount";
 import fs from "fs-extra";
 import { paths } from "../utils/paths";
-import { Config, configArgs, ConfigJSON } from "./config";
+import { Config, configArgs } from "./config";
 import { mergeNonNullishValue, plainToClass } from "../utils/object";
+import { ConfigJSON } from "./json";
 
 export class ConfigManager {
   static getTempNativeFolder(): string {
@@ -55,7 +56,6 @@ export class ConfigManager {
     try {
       config = JSON.parse(fs.readFileSync(paths.launcher.configFile, "utf-8"));
     } catch (err) {
-      console.log(err);
       fs.ensureDirSync(paths.launcher.$path);
       this.save();
       return;
@@ -66,6 +66,7 @@ export class ConfigManager {
       args: configArgs,
     };
     this.config = mergeNonNullishValue(this.config, plainToClass(def, config));
+
     this.save();
   }
 }

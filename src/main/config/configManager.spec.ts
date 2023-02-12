@@ -28,7 +28,6 @@ describe("ConfigManager", () => {
     configManager.createAccount(authAccount);
     expect(Object.keys(configManager.config.accounts).length).toBe(1);
     expect(configManager.config.selectedUUID).toBe(authAccount.uuid);
-    console.log(vol.toJSON());
     expect(vol.toJSON()).toStrictEqual({
       "/userData/config.json":
         "{\n" +

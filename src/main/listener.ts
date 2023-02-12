@@ -4,9 +4,11 @@ import { ConfigManager } from "./config/configManager";
 import { runMinecraft } from "./runMinecraft";
 import { DistroManager } from "./distribution/distroManager";
 import { MSAWindowManager } from "./window/msaLogin";
-import { ViewState } from "../common/types";
+import { Module as ViewModule, ViewState } from "../common/types";
 import { actions, PayloadFromActionCreator } from "../common/actions";
 import fs from "fs-extra";
+import { Types } from "./distribution/constatnts";
+import { Module } from "./distribution/module";
 
 export function setListener() {
   windowListener();
@@ -16,6 +18,40 @@ export function setListener() {
 }
 function viewListener() {
   ipcMain.handle(MainChannel.state.GET_STATE, function (): ViewState {
+    const modSetting = ConfigManager.getModsSetting(ConfigManager.INSTANCE.config.selectedServer)!;
+    const modules = DistroManager.getDistribution()?.getServer(ConfigManager.INSTANCE.config.selectedServer)?.modules;
+    const recursiveModule = (acc: { required: ViewModule[]; option: ViewModule[] }, module: Module) => {
+      const type = module.type;
+      if (type !== Types.ForgeMod && type !== Types.LiteMod && type !== Types.LiteLoader) {
+        return acc;
+      }
+      function convertModule(m: Module) {
+        return {
+          name: m.name,
+          version: m.artifactVersion,
+          versionlessID: m.versionLessID,
+          submodules:
+            m.subModules &&
+            m.subModules.reduce(recursiveModule, { required: [], option: [] } as {
+              required: ViewModule[];
+              option: ViewModule[];
+            }),
+          value: modSetting.isModEnabled(m.versionLessID, m.required.def),
+        };
+      }
+      if (module.required.value) {
+        acc.required.push(convertModule(module));
+      } else {
+        acc.option.push(convertModule(module));
+      }
+      return acc;
+    };
+    const modsInitial = {
+      required: [],
+      option: [],
+      selectedServer: ConfigManager.INSTANCE.config.selectedServer,
+    };
+    const mods = (modules?.reduce(recursiveModule, modsInitial) || modsInitial) as ViewState["setting"]["mod"];
     return {
       overlay: {
         selectedServer: ConfigManager.INSTANCE.config.selectedServer,
@@ -56,6 +92,7 @@ function viewListener() {
           dataDirectory: ConfigManager.getLauncherSetting().dataDirectory,
           allowPrerelease: ConfigManager.getLauncherSetting().allowPrerelease,
         },
+        mod: mods,
       },
     };
   });

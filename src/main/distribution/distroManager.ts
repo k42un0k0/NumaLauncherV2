@@ -8,21 +8,28 @@ import { Required } from "./required";
 import { Module } from "./module";
 import { Server } from "./server";
 import { DistroJson, ModuleJson } from "./json";
+import { ModSetting } from "../config/modSetting";
 
 export class DistroManager {
   async load() {
     const distroURL = "https://raw.githubusercontent.com/TeamKun/ModPacks/deploy/distribution.json";
     const response = await axios.get<DistroJson>(distroURL, { timeout: 2500 });
-    const data = DistroManager.jsonToDistroIndex(response.data);
+    const distroIndex = DistroManager.jsonToDistroIndex(response.data);
     fs.writeFileSync(paths.launcher.distroFile, JSON.stringify(response.data));
     if (
       !ConfigManager.INSTANCE.config.selectedServer ||
       this.data?.getServer(ConfigManager.INSTANCE.config.selectedServer) == null
     ) {
-      ConfigManager.INSTANCE.config.selectedServer = data.mainServer;
-      ConfigManager.INSTANCE.save();
+      ConfigManager.INSTANCE.config.selectedServer = distroIndex.mainServer;
     }
-    return data;
+    ConfigManager.INSTANCE.config.setting.mods = distroIndex.servers.map((server) => {
+      const id = server.id;
+      const modules = server.modules;
+      const setting = ConfigManager.getModsSetting(id) || new ModSetting(id, {});
+      setting.mergeDistroModules(modules);
+      return setting;
+    });
+    ConfigManager.INSTANCE.save();
   }
 
   async loadLocal() {
@@ -44,7 +51,7 @@ export class DistroManager {
   static jsonToDistroIndex(dist: DistroJson): DistroIndex {
     function subModules(modules: ModuleJson[], serverid: string): Module[] {
       return modules.map((module) => {
-        const required: Required = new Required(module.required?.value, module.required?.value);
+        const required: Required = new Required(module.required?.value, module.required?.def);
         const artifact = new Artifact(
           module.artifact.size,
           module.artifact.MD5,

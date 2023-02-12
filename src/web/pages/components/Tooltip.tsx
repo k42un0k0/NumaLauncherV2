@@ -27,7 +27,6 @@ export default function Tooltip({ children, tooltip }: Props) {
     const top = targetHeight / 2 - toolTipHeight / 2;
     const leftForLeft = -toolTipWidth - margin;
     const leftForRight = toolTipWidth + margin;
-    console.log(clientRect.x + leftForLeft);
     if (clientRect.x + leftForLeft > 0) {
       setPos({
         top: `${top}px`,

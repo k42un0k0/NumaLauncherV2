@@ -211,7 +211,6 @@ function _resolveModuleLibraries(mdl: Module): string[] {
       if (sm.type === Types.Library) {
         // TODO Add as file or something.
         const x = sm.id;
-        console.log(x);
         if (
           x.includes(":universal") ||
           x.includes(":slim") ||
@@ -219,7 +218,6 @@ function _resolveModuleLibraries(mdl: Module): string[] {
           x.includes(":srg") ||
           x.includes(":client")
         ) {
-          console.log("SKIPPING " + x);
           return acc;
         }
         acc = acc.concat(sm.artifactPath);

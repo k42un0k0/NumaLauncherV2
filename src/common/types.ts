@@ -33,9 +33,24 @@ export type ViewState = {
       allowPrerelease: boolean;
       dataDirectory: string;
     };
+    mod: {
+      required: Module[];
+      option: Module[];
+      selectedServer: string;
+    };
   };
 };
-interface Server {
+export type Module = {
+  value: boolean;
+  name: string;
+  version: string;
+  versionlessID: string;
+  subModules?: {
+    required: Module[];
+    option: Module[];
+  };
+};
+export interface Server {
   icon?: string;
   id: string;
   description: string;
