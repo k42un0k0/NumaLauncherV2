@@ -96,7 +96,8 @@ export default class ProcessBuilder {
     }
 
     logger.log("Launch Arguments:", args);
-
+    fs.writeFileSync("./log.json", JSON.stringify(args));
+    return;
     const child = child_process.spawn(getJDKPath(), args, {
       cwd: this.gameDir,
       detached: ConfigManager.getGameSetting().launchDetached,

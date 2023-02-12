@@ -146,7 +146,7 @@ function globalListener() {
     return "success";
   });
   ipcMain.handle(MainChannel.RUN_MINECRAFT, function (event) {
-    return runMinecraft(event);
+    return runMinecraft();
   });
   ipcMain.on(MainChannel.IMPORT_OFFICIAL_SKIN_INFO, function (event) {
     throw new Error("not implemented");

@@ -41,6 +41,7 @@ export function forEachOfLimit<T>(
   limit: number,
   iteratee: (value: T, index: number) => Promise<void>
 ): Promise<void> {
+  if (!Array.isArray(coll)) throw new Error();
   return new Promise((resolve) => {
     let globalIndex = 0;
     const last = coll.length;
