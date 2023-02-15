@@ -14,9 +14,7 @@ export class LauncherSetting {
         common: {
           libraries: {},
           modstore: {},
-          versions: {
-            libraries: {},
-          },
+          versions: {},
           assets: {
             log_configs: {},
             indexes: {},

@@ -45,8 +45,6 @@ export class ArgBuilder113 {
     server: Server,
     valueAfterReplace: (value: string) => Record<string, string>
   ) {
-    const argDiscovery = /\${*(.*)}/;
-
     // JVM Arguments First
     let args: VersionDataArg[] = versionData.arguments.jvm;
 

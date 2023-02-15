@@ -12,7 +12,7 @@ export const argDiscovery = /\${*(.*)}/;
 export function replaceJVMArgument(arg: string, valueAfterReplace: (value: string) => Record<string, string>): string {
   if (argDiscovery.test(arg)) {
     const identifier = arg.match(argDiscovery)![1];
-    return valueAfterReplace(arg)[identifier];
+    return valueAfterReplace(arg)[identifier] || arg;
   }
   return arg;
 }

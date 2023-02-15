@@ -24,7 +24,7 @@ import { VersionData113 } from "./versionManifest/versionData113";
 
 const logger = LoggerUtil("%c[ProcessBuilder]", "color: #003996; font-weight: bold");
 
-export default class ProcessBuilder {
+export class ProcessBuilder {
   gameDir: string;
   commonDir: string;
   server: Server;
@@ -97,7 +97,6 @@ export default class ProcessBuilder {
 
     logger.log("Launch Arguments:", args);
     fs.writeFileSync("./log.json", JSON.stringify(args));
-    return;
     const child = child_process.spawn(getJDKPath(), args, {
       cwd: this.gameDir,
       detached: ConfigManager.getGameSetting().launchDetached,

@@ -69,7 +69,7 @@ interface VersionUrlResonse {
 export async function getVersionUrl(version: string) {
   const response = await axios.get<VersionUrlResonse>("https://launchermeta.mojang.com/mc/game/version_manifest.json");
   const v = response.data.versions.find((v) => {
-    return (v.id = version);
+    return v.id === version;
   });
   if (v == null) throw Error;
   return v.url;
