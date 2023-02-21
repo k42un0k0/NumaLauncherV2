@@ -33,5 +33,12 @@ const preload: MainPreload = {
   runMinecraft: () => ipcRenderer.invoke(MainChannel.RUN_MINECRAFT),
   importOfficialSkinInfo: () => ipcRenderer.invoke(MainChannel.IMPORT_OFFICIAL_SKIN_INFO),
   openServerDir: () => ipcRenderer.send(MainChannel.OPEN_SERVER_DIR),
+  onRunMinecraft(listener) {
+    const cb = (_: any, action: any) => {
+      listener(action.type, action.payload);
+    };
+    ipcRenderer.on(RendererChannel.ON_RUN_MINECRAFT, cb);
+    return () => ipcRenderer.off(RendererChannel.ON_RUN_MINECRAFT, cb);
+  },
 };
 contextBridge.exposeInMainWorld("main", preload);

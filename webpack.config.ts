@@ -50,6 +50,12 @@ const preload: Configuration = {
   entry: { preload: "./src/main/preload.ts" },
 };
 
+const manualPreload: Configuration = {
+  ...common,
+  target: "electron-preload",
+  entry: { manualPreload: "./src/main/manualPreload.ts" },
+};
+
 const renderer: Configuration = {
   ...common,
   target: "web",
@@ -57,4 +63,4 @@ const renderer: Configuration = {
   plugins: [new MiniCssExtractPlugin(), new HtmlWebpackPlugin({ template: "./src/web/index.html" })],
 };
 
-export default [main, preload, renderer];
+export default [main, preload, manualPreload, renderer];

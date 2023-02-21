@@ -57,6 +57,7 @@ export interface ManualJson {
 
 export interface HintJson {
   css: string;
+  script?: string;
 }
 
 export interface RequiredJson {

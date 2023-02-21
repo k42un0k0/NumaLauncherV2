@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain, shell } from "electron";
+import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { handleActions, MainChannel } from "./utils/channels";
 import { ConfigManager } from "./config/configManager";
 import { runMinecraft } from "./runMinecraft";
@@ -9,6 +9,7 @@ import { actions, PayloadFromActionCreator } from "../common/actions";
 import fs from "fs-extra";
 import { Types } from "./distribution/constatnts";
 import { Module } from "./distribution/module";
+import path from "path";
 
 export function setListener() {
   windowListener();

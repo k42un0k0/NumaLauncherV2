@@ -25,6 +25,7 @@ export const MainChannel = {
 
 export const RendererChannel = {
   CLOSE_MSA_LOGIN_WINDOW: "WINDOW/CLOSE_MSA_LOGIN_WINDOW",
+  ON_RUN_MINECRAFT: "ON_RUN_MINECRAFT",
 };
 
 export function handleActions(

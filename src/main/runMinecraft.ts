@@ -7,7 +7,7 @@ import { IpcMainInvokeEvent, WebContents } from "electron";
 import { forEachOfLimit } from "./utils/util";
 import electron from "electron";
 import { ProcessBuilder } from "./processbuilder";
-import { DLTracker } from "./downloader/asset";
+import { DLTracker } from "./downloader/dlTracker";
 import { validateAssets, validateDistribution, validateLibraries, validateMiscellaneous } from "./downloader/validator";
 import { loadVersionData } from "./versionManifest/helper";
 import { loadForgeData } from "./forge";
@@ -16,6 +16,7 @@ import { ModSettingValue } from "./config/modSetting";
 import { Required } from "./distribution/required";
 import { Module } from "./distribution/module";
 import { Artifact } from "./distribution/artifact";
+import { RendererChannel } from "./utils/channels";
 
 export async function runMinecraft(event: IpcMainInvokeEvent) {
   const distribution = DistroManager.INSTANCE.data!;
@@ -27,41 +28,41 @@ export async function runMinecraft(event: IpcMainInvokeEvent) {
   }
   const manualData = await loadManualData(server);
   if (manualData.length > 0) {
-    return {
-      versionData: null,
-      forgeData: null,
-      manualData,
-      error: "Manual Installation Required",
-    };
+    event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "close", payload: manualData });
+
+    return;
   }
   // サイズを図ってthis.forgeに入れる;
   const [forge, extractQueue] = validateDistribution(server);
-  // .numalauncherに指定バージョンのマイクラのjsonがあるか調べる
+  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "distribution" });
   const versionData = await loadVersionData(server.minecraftVersion);
-  // サイズを図ってthis.assetsに入れる
-  const assets = await validateAssets(versionData);
-  //   // サイズを図ってthis.librariesに入れる
+  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "version" });
+  const assets = await validateAssets(versionData, event.sender);
+  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "assets" });
   const libraries = await validateLibraries(versionData);
-  //   // サイズを図ってthis.filesに入れる
+  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "libraries" });
   const files = await validateMiscellaneous(versionData);
-  processDLQueues(event.sender, [
+  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "files" });
+  await processDLQueues(event.sender, [
     { dltracker: forge, limit: 20 },
     { dltracker: assets, limit: 20 },
     { dltracker: libraries, limit: 5 },
     { dltracker: files, limit: 5 },
   ] as { dltracker: DLTracker; limit: number }[]);
+  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "forge" });
   const forgeData = await loadForgeData(server);
   const authUser = ConfigManager.INSTANCE.getSelectedAccount();
   const pb = new ProcessBuilder(server, versionData, forgeData, authUser, electron.app.getVersion());
   pb.build();
+  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "close" });
 }
 
-function processDLQueues(sender: WebContents, dltrackerData: { dltracker: DLTracker; limit: number }[]) {
+async function processDLQueues(sender: WebContents, dltrackerData: { dltracker: DLTracker; limit: number }[]) {
   let progress = 0;
   let totalSize = 0;
-  dltrackerData.forEach((item) => {
+  for (const item of dltrackerData) {
     totalSize += item.dltracker.dlsize;
-    forEachOfLimit(item.dltracker.dlqueue, item.limit, async (asset) => {
+    await forEachOfLimit(item.dltracker.dlqueue, item.limit, async (asset) => {
       fs.ensureDirSync(path.join(asset.to, ".."));
       const response = await fetch(asset.from);
       const size = Number(response.headers.get("content-length"));
@@ -72,13 +73,20 @@ function processDLQueues(sender: WebContents, dltrackerData: { dltracker: DLTrac
       response.body?.pipe(writeStream);
       response.body?.on("data", (chunk) => {
         progress += chunk.length;
-        // sender.send(RendererChannel.RUN_MINECRAFT_EMITTER, "progress", {
-        //   progress,
-        //   totalSize,
-        // });
+        sender.send(RendererChannel.ON_RUN_MINECRAFT, {
+          type: "progress",
+          payload: {
+            type: "download",
+            progress,
+            total: totalSize,
+          },
+        });
+      });
+      return new Promise((resolve) => {
+        response.body?.on("close", () => resolve());
       });
     });
-  });
+  }
 }
 
 /**

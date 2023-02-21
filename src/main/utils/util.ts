@@ -42,24 +42,25 @@ export function forEachOfLimit<T>(
   iteratee: (value: T, index: number) => Promise<void>
 ): Promise<void> {
   if (!Array.isArray(coll)) throw new Error();
-  return new Promise((resolve) => {
-    let globalIndex = 0;
-    const last = coll.length;
-    const iterater = (localIndex: number) => {
-      if (localIndex == last) resolve();
-      if (localIndex >= last) return;
-      if (coll[localIndex] == null) return;
-      iteratee(coll[localIndex], localIndex)
-        .then(() => {
-          iterater(globalIndex++);
-        })
-        .catch(() => {
-          iterater(globalIndex++);
-        });
-    };
-    for (let i = 0; i < limit; i++) {
-      iterater(globalIndex++);
-    }
+  let globalIndex = 0;
+  const last = coll.length;
+  const iterater = (localIndex: number): Promise<void> => {
+    if (localIndex >= last) return Promise.resolve();
+    if (coll[localIndex] == null) return Promise.resolve();
+    return iteratee(coll[localIndex], localIndex)
+      .then((): Promise<void> => {
+        return iterater(globalIndex++);
+      })
+      .catch(() => {
+        iterater(globalIndex++);
+      });
+  };
+  const promise: Promise<void>[] = [];
+  for (let i = 0; i < limit; i++) {
+    promise.push(iterater(globalIndex++));
+  }
+  return Promise.all(promise).then(() => {
+    void 0;
   });
 }
 

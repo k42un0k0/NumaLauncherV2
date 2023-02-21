@@ -104,6 +104,7 @@ export const paths = genPaths(
       distroFile: "distribution.json",
     },
     preloadFile: path.resolve(__dirname, "preload.js"),
+    manualPreloadFile: path.resolve(__dirname, "manualPreload.js"),
     minecraftLauncherData: {
       numaSkinFile: "numa_skins.json",
       originSkinFile: "launcher_custom_skins.json",

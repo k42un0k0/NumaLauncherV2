@@ -1,13 +1,16 @@
 import { ConfigManager } from "../config/configManager";
 import { VersionData112 } from "../versionManifest/versionData112";
 import { VersionData113 } from "../versionManifest/versionData113";
-import { Asset, DLTracker } from "./asset";
+import { Asset } from "./asset";
+import { DLTracker } from "./dlTracker";
 import path from "path";
 import { getAssetIndex, validateRules } from "../versionManifest/helper";
 import { Server } from "../distribution/server";
 import { mojangFriendlyOS } from "../utils/util";
+import { WebContents } from "electron";
+import { RendererChannel } from "../utils/channels";
 
-export async function validateAssets(versionData: VersionData112 | VersionData113) {
+export async function validateAssets(versionData: VersionData112 | VersionData113, sender: WebContents) {
   const data = await getAssetIndex(versionData);
   //Asset constants
   function toAsset(key: string) {
@@ -19,7 +22,12 @@ export async function validateAssets(versionData: VersionData112 | VersionData11
     return new Asset(key, hash, data.objects[key].size, resourceURL + urlName, localPath.objects.$join(assetName));
   }
   const assets = Object.keys(data.objects).map(toAsset);
-  return DLTracker.fromAssetList("assets", "sha1", assets);
+  return DLTracker.fromAssetList("assets", "sha1", assets, (index) => {
+    sender.send(RendererChannel.ON_RUN_MINECRAFT, {
+      type: "progress",
+      payload: { type: "assets", total: assets.length, progress: index },
+    });
+  });
 }
 
 export function validateMiscellaneous(versionData: VersionData112 | VersionData113) {
