@@ -6,11 +6,11 @@ import { mcVersionAtLeast, mojangFriendlyOS } from "../utils/util";
 import { VersionData112 } from "../versionManifest/versionData112";
 import { VersionData113 } from "../versionManifest/versionData113";
 import fs from "fs-extra";
-import { validateRules } from "./helper";
 import AdmZip from "adm-zip";
 import { Module } from "../distribution/module";
 import { Server } from "../distribution/server";
 import { Types } from "../distribution/constatnts";
+import { validateRules } from "../versionManifest/helper";
 /**
  * Resolve the full classpath argument list for this process. This method will resolve all Mojang-declared
  * libraries as well as the libraries declared by the server. Since mods are permitted to declare libraries,
@@ -106,7 +106,7 @@ function _resolveMojangLibraries(
   for (let i = 0; i < libArr.length; i++) {
     const lib = libArr[i];
     console.log(lib);
-    // @ts-expect-error aaaa
+    // @ts-expect-error aaa
     if (validateRules(lib.rules, lib.natives)) {
       // @ts-expect-error aaa
       if (lib.natives == null) {

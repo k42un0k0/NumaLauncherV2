@@ -3,8 +3,6 @@ import { ModSetting } from "../config/modSetting";
 import { Module } from "../distribution/module";
 import { Server } from "../distribution/server";
 import { Types } from "../distribution/constatnts";
-import { mojangFriendlyOS } from "../utils/util";
-import { VersionData113 } from "../versionManifest/versionData113";
 
 export const classpathSeparator = process.platform === "win32" ? ";" : ":";
 
@@ -54,32 +52,4 @@ export function resolveModConfiguration(modCfg: ModSetting, mdls: Module[]) {
     fMods,
     lMods,
   };
-}
-
-export function validateRules(
-  rules: VersionData113["libraries"][0]["rules"],
-  natives: VersionData113["libraries"][0]["natives"]
-) {
-  if (rules == null) {
-    if (natives == null) {
-      return true;
-    } else {
-      return natives[mojangFriendlyOS()] != null;
-    }
-  }
-
-  for (const rule of rules) {
-    const action = rule.action;
-    const osProp = rule.os;
-    if (action != null && osProp != null) {
-      const osName = osProp.name;
-      const osMoj = mojangFriendlyOS();
-      if (action === "allow") {
-        return osName === osMoj;
-      } else if (action === "disallow") {
-        return osName !== osMoj;
-      }
-    }
-  }
-  return true;
 }

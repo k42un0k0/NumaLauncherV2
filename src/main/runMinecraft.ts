@@ -1,145 +1,22 @@
 import path from "path";
 import { ConfigManager } from "./config/configManager";
-import axios from "axios";
 import fs from "fs-extra";
 import { DistroManager } from "./distribution/distroManager";
-import { getVersionUrl } from "./api/mojang";
 import fetch from "node-fetch";
-import crypto from "crypto";
-import { app, IpcMainInvokeEvent, WebContents } from "electron";
-import { VersionData112 } from "./versionManifest/versionData112";
-import { VersionData113 } from "./versionManifest/versionData113";
-import { forEachOfLimit, getJDKPath, isDev, isForgeGradle3, isMac, mojangFriendlyOS } from "./utils/util";
-import { validateRules } from "./jvmArgBuilder/helper";
-import { ForgeData112 } from "./versionManifest/forgeData112";
-import { ForgeData113 } from "./versionManifest/forgeData113";
-import AdmZip from "adm-zip";
-import childProcess from "child_process";
-import { Module } from "./distribution/module";
-import { Server } from "./distribution/server";
-import { Types } from "./distribution/constatnts";
+import { IpcMainInvokeEvent, WebContents } from "electron";
+import { forEachOfLimit } from "./utils/util";
 import electron from "electron";
 import { ProcessBuilder } from "./processbuilder";
+import { DLTracker } from "./downloader/asset";
+import { validateAssets, validateDistribution, validateLibraries, validateMiscellaneous } from "./downloader/validator";
+import { loadVersionData } from "./versionManifest/helper";
+import { loadForgeData } from "./forge";
+import { Server } from "./distribution/server";
+import { ModSettingValue } from "./config/modSetting";
+import { Required } from "./distribution/required";
+import { Module } from "./distribution/module";
+import { Artifact } from "./distribution/artifact";
 
-async function loadVersionData(version: string) {
-  const versionPath = ConfigManager.getLauncherSetting().getDataDirectory().common.versions.$join(version);
-  const versionFile = path.join(versionPath, version + ".json");
-  if (!fs.existsSync(versionFile)) {
-    const url = await getVersionUrl(version);
-    //This download will never be tracked as it's essential and trivial.
-    console.log("Preparing download of " + version + " assets.");
-    fs.ensureDirSync(versionPath);
-    const response = await axios.get(url);
-    const data = response.data;
-    fs.writeFileSync(versionFile, JSON.stringify(data));
-    return data;
-  } else {
-    return JSON.parse(fs.readFileSync(versionFile).toString());
-  }
-}
-async function validateAssets(versionData: VersionData112 | VersionData113) {
-  const assetIndex = versionData.assetIndex;
-  const name = assetIndex.id + ".json";
-  const indexPath = ConfigManager.getLauncherSetting().getDataDirectory().common.assets.indexes;
-  const assetIndexLoc = indexPath.$join(name);
-
-  let data;
-  if (!fs.existsSync(assetIndexLoc)) {
-    console.log("Downloading " + versionData.id + " asset index.");
-    fs.ensureDirSync(indexPath.$path);
-    const response = await axios.get(assetIndex.url);
-    data = response.data;
-    fs.writeFileSync(assetIndexLoc, JSON.stringify(data));
-  } else {
-    data = JSON.parse(fs.readFileSync(assetIndexLoc, "utf-8"));
-  }
-  return await _assetChainValidateAssets(versionData, data);
-}
-
-class Asset {
-  id: any;
-  hash: string;
-  size: number;
-  from: string;
-  to: string;
-  /**
-   * Create an asset.
-   *
-   * @param {any} id The id of the asset.
-   * @param {string} hash The hash value of the asset.
-   * @param {number} size The size in bytes of the asset.
-   * @param {string} from The url where the asset can be found.
-   * @param {string} to The absolute local file path of the asset.
-   */
-  constructor(id: any, hash: string, size: number, from: string, to: string) {
-    this.id = id;
-    this.hash = hash;
-    this.size = size;
-    this.from = from;
-    this.to = to;
-  }
-}
-async function _assetChainValidateAssets(
-  versionData: VersionData112 | VersionData113,
-  indexData: { objects: Record<string, any> }
-) {
-  //Asset constants
-  const resourceURL = "https://resources.download.minecraft.net/";
-  const localPath = ConfigManager.getLauncherSetting().getDataDirectory().common.assets;
-
-  const assetDlQueue: Asset[] = [];
-  let dlSize = 0;
-  let acc = 0;
-  await forEachOfLimit(Object.keys(indexData.objects), 10, async (value) => {
-    acc++;
-    const hash = indexData.objects[value].hash;
-    const assetName = path.join(hash.substring(0, 2), hash);
-    const urlName = hash.substring(0, 2) + "/" + hash;
-    const ast = new Asset(
-      value,
-      hash,
-      indexData.objects[value].size,
-      resourceURL + urlName,
-      localPath.objects.$join(assetName)
-    );
-    if (!_validateLocal(ast.to, "sha1", ast.hash)) {
-      dlSize += ast.size * 1;
-      assetDlQueue.push(ast);
-    }
-  });
-  return new DLTracker(assetDlQueue, dlSize);
-}
-
-class DLTracker {
-  dlqueue: Asset[];
-  dlsize: number;
-  callback?: (asset: Asset) => void;
-  /**
-   * Create a DLTracker
-   *
-   * @param {Array.<Asset>} dlqueue An array containing assets queued for download.
-   * @param {number} dlsize The combined size of each asset in the download queue array.
-   * @param {function(Asset)} callback Optional callback which is called when an asset finishes downloading.
-   */
-  constructor(dlqueue: Asset[], dlsize: number, callback?: (asset: Asset) => void) {
-    this.dlqueue = dlqueue;
-    this.dlsize = dlsize;
-    this.callback = callback;
-  }
-}
-function _validateLocal(filePath: string, algo: string, hash: string): boolean {
-  if (filePath == null) return false;
-  if (!fs.existsSync(filePath)) return false;
-  //No hash provided, have to assume it's good.
-  if (hash == null) return true;
-
-  const buf = fs.readFileSync(filePath);
-  const calcdhash = _calculateHash(buf, algo);
-  return calcdhash === hash.toLowerCase();
-}
-function _calculateHash(buf: Buffer, algo: string) {
-  return crypto.createHash(algo).update(buf).digest("hex");
-}
 export async function runMinecraft(event: IpcMainInvokeEvent) {
   const distribution = DistroManager.INSTANCE.data!;
   const selectedServer = ConfigManager.INSTANCE.config.selectedServer;
@@ -148,10 +25,14 @@ export async function runMinecraft(event: IpcMainInvokeEvent) {
     // サーバーが選択されてない時の処理
     throw new Error("サーバーが選択されていません");
   }
-  const manualArtifact = server?.modules.map((module) => module.artifact).filter((artifact) => !!artifact.manual);
-  if (manualArtifact.length > 0) {
-    // マニュアルmodをインストールさせる
-    throw new Error();
+  const manualData = await loadManualData(server);
+  if (manualData.length > 0) {
+    return {
+      versionData: null,
+      forgeData: null,
+      manualData,
+      error: "Manual Installation Required",
+    };
   }
   // サイズを図ってthis.forgeに入れる;
   const [forge, extractQueue] = validateDistribution(server);
@@ -175,112 +56,6 @@ export async function runMinecraft(event: IpcMainInvokeEvent) {
   pb.build();
 }
 
-async function validateLibraries(versionData: VersionData112 | VersionData113) {
-  const libArr = versionData.libraries;
-
-  const libDlQueue: Asset[] = [];
-  let dlSize = 0;
-
-  await forEachOfLimit(
-    libArr as (VersionData112["libraries"][0] | VersionData113["libraries"][0])[],
-    5,
-    async (lib) => {
-      if (!("natives" in lib) || validateRules(lib.rules, lib.natives)) {
-        const artifact =
-          !("natives" in lib) || lib.natives == null
-            ? lib.downloads.artifact
-            : lib.downloads.classifiers[
-                lib.natives[mojangFriendlyOS()]?.replace("${arch}", process.arch.replace("x", "")) || ""
-              ];
-        const libItm = new Asset(
-          lib.name,
-          artifact.sha1,
-          artifact.size,
-          artifact.url,
-          ConfigManager.getLauncherSetting().getDataDirectory().common.libraries.$join(artifact.path)
-        );
-        if (!_validateLocal(libItm.to, "sha1", libItm.hash)) {
-          dlSize += libItm.size * 1;
-          libDlQueue.push(libItm);
-        }
-      }
-    }
-  );
-  return new DLTracker(libDlQueue, dlSize);
-}
-function validateMiscellaneous(versionData: VersionData112 | VersionData113) {
-  const baseDltracker = new DLTracker([], 0);
-  const dltrackers = [validateClient(versionData), validateLogConfig(versionData)];
-  dltrackers.forEach((dltracker) => {
-    if (!dltracker) return;
-    baseDltracker.dlqueue = baseDltracker.dlqueue.concat(dltracker.dlqueue);
-    baseDltracker.dlsize += dltracker.dlsize;
-  });
-
-  return baseDltracker;
-}
-function validateLogConfig(versionData: VersionData112 | VersionData113) {
-  const client = versionData.logging.client;
-  const file = client.file;
-
-  const logConfig = new Asset(
-    file.id,
-    file.sha1,
-    file.size,
-    file.url,
-    ConfigManager.getLauncherSetting().getDataDirectory().common.assets.log_configs.$join(file.id)
-  );
-
-  if (!_validateLocal(logConfig.to, "sha1", logConfig.hash)) {
-    return new DLTracker([logConfig], logConfig.size * 1);
-  }
-}
-function validateClient(versionData: VersionData112 | VersionData113) {
-  const clientData = versionData.downloads.client;
-  const version = versionData.id;
-
-  const client = new Asset(
-    version + " client",
-    clientData.sha1,
-    clientData.size,
-    clientData.url,
-    ConfigManager.getLauncherSetting()
-      .getDataDirectory()
-      .common.versions.$join(version, version + ".jar")
-  );
-
-  if (!_validateLocal(client.to, "sha1", client.hash)) {
-    return new DLTracker([client], client.size * 1);
-  }
-}
-function validateDistribution(server: Server) {
-  const extractQueue: string[] = [];
-  function parse(modules: Module[]) {
-    let alist: Asset[] = [];
-    let asize = 0;
-    for (const ob of modules) {
-      const obArtifact = ob.artifact;
-      const obPath = ob.artifactPath;
-      const asset = new Asset(ob.id, obArtifact.MD5, obArtifact.size, obArtifact.url, obPath);
-      const validationPath = obPath?.toLowerCase().endsWith(".pack.xz")
-        ? obPath.substring(0, obPath.toLowerCase().lastIndexOf(".pack.xz"))
-        : obPath;
-      if (!_validateLocal(validationPath, "MD5", asset.hash)) {
-        asize += asset.size * 1;
-        alist.push(asset);
-        if (validationPath !== obPath) extractQueue.push(obPath);
-      }
-      //Recursively process the submodules then combine the results.
-      if (ob.subModules != null) {
-        const dltrack = parse(ob.subModules);
-        asize += dltrack.dlsize * 1;
-        alist = alist.concat(dltrack.dlqueue);
-      }
-    }
-    return new DLTracker(alist, asize);
-  }
-  return [parse(server.modules), extractQueue];
-}
 function processDLQueues(sender: WebContents, dltrackerData: { dltracker: DLTracker; limit: number }[]) {
   let progress = 0;
   let totalSize = 0;
@@ -306,117 +81,55 @@ function processDLQueues(sender: WebContents, dltrackerData: { dltracker: DLTrac
   });
 }
 
-async function loadForgeData(server: Server): Promise<ForgeData112 | ForgeData113> {
-  const modules = server.modules;
-  for (const ob of modules) {
-    const type = ob.type;
-    if (type === Types.Forge) {
-      if (isForgeGradle3(server.minecraftVersion, ob.artifactVersion)) {
-        const forgeVer = ob.artifactVersion.split("-");
-        const forgeVersion = `${forgeVer[0]}-forge-${forgeVer[1]}`;
-        const forgeManifest = ConfigManager.getLauncherSetting()
-          .getDataDirectory()
-          .common.versions.$join(forgeVersion, `${forgeVersion}.json`);
-        if (fs.existsSync(forgeManifest)) {
-          const manifest = JSON.parse(fs.readFileSync(forgeManifest, "utf-8"));
-          const dlTracker = await validateLibraries(manifest);
-          if (dlTracker.dlqueue.length === 0) {
-            return manifest;
-          }
-        }
-
-        await _installForgeWithCLI(
-          ob.artifactPath,
-          ConfigManager.getLauncherSetting().getDataDirectory().common.$path,
-          getJDKPath()
-        );
-        if (fs.existsSync(forgeManifest)) {
-          return JSON.parse(fs.readFileSync(forgeManifest, "utf-8"));
-        }
-
-        throw "No forge version manifest found!";
-      }
-    } else if (type === Types.ForgeHosted) {
-      if (isForgeGradle3(server.minecraftVersion, ob.artifactVersion)) {
-        // Read Manifest
-        for (const sub of ob.subModules || []) {
-          if (sub.type === Types.VersionManifest) {
-            return JSON.parse(fs.readFileSync(sub.artifactPath, "utf-8"));
-          }
-        }
-        throw "No forge version manifest found!";
-      } else {
-        const obArtifact = ob.artifact;
-        const obPath = ob.artifactPath;
-        const asset = new Asset(ob.id, obArtifact.MD5, obArtifact.size, obArtifact.url, obPath);
-        const forgeData = await unzipForgeVersionData(asset);
-        return forgeData;
-      }
-    }
+/**
+ * 手動ダウンロードのファイルをリストアップし、ユーザーにダウンロードを促します
+ *
+ * @param {string} server The Server to load Forge data for.
+ * @returns {Promise.<Object>} A promise which resolves to Forge's version.json data.
+ */
+async function loadManualData(server: Server) {
+  function isModEnabled(modCfg: ModSettingValue, required: Required) {
+    return modCfg != null
+      ? (typeof modCfg === "boolean" && modCfg) ||
+          (typeof modCfg === "object" && (typeof modCfg.value !== "undefined" ? modCfg.value : true))
+      : required != null
+      ? required.def
+      : true;
   }
-  throw "No forge module found!";
-}
 
-async function unzipForgeVersionData(asset: Asset) {
-  const data = fs.readFileSync(asset.to);
-  const zip = new AdmZip(data);
-  const zipEntries = zip.getEntries();
+  // 有効化されているかチェックするために必要
+  const modCfg = ConfigManager.getModsSetting(server.id)!.mods;
+  const mdls = server.modules;
 
-  for (let i = 0; i < zipEntries.length; i++) {
-    if (zipEntries[i].entryName === "version.json") {
-      const forgeVersion = JSON.parse(zip.readAsText(zipEntries[i]));
-      const versionPath = ConfigManager.getLauncherSetting().getDataDirectory().common.versions.$join(forgeVersion.id);
-      const versionFile = path.join(versionPath, forgeVersion.id + ".json");
-      if (!fs.existsSync(versionFile)) {
-        fs.ensureDirSync(versionPath);
-        fs.writeFileSync(path.join(versionPath, forgeVersion.id + ".json"), zipEntries[i].getData());
-        return forgeVersion;
+  // 手動ダウンロードMod候補
+  const manualModsCandidate: Module[] = [];
+  // ON以外の手動Modは除外する
+  const removeCandidate: number[] = [];
+  mdls.forEach((mdl, index, object) => {
+    const artifact = mdl.artifact;
+    const manual = artifact.manual;
+    // 手動Modかどうか
+    if (manual !== undefined) {
+      // ONかどうか
+      const o = !mdl.required.value;
+      const e = isModEnabled(modCfg[mdl.versionLessID], mdl.required);
+      if (!o || (o && e)) {
+        manualModsCandidate.push(mdl);
       } else {
-        //Read the saved file to allow for user modifications.
-        return JSON.parse(fs.readFileSync(versionFile, "utf-8"));
+        removeCandidate.push(index);
       }
     }
-  }
-  //We didn't find forge's version.json.
-  throw "Unable to finalize Forge processing, version.json not found! Has forge changed their format?";
-}
-
-async function _installForgeWithCLI(installerExec: string, workDir: string, javaExecutable: string): Promise<void> {
-  console.log("[ForgeCLI] Starting");
-  return new Promise((resolve, reject) => {
-    // Required for the installer to function.
-    fs.writeFileSync(path.join(workDir, "launcher_profiles.json"), JSON.stringify({}));
-
-    let libPath;
-    if (isDev) {
-      libPath = path.join(app.getAppPath(), "libraries", "java", "ForgeCLI.jar");
-    } else {
-      if (isMac) {
-        // process.cwdでは正常にパスが取得できないので__dirnameで対応
-        libPath = path.join(app.getAppPath(), "libraries", "java", "ForgeCLI.jar");
-      } else {
-        libPath = path.join(app.getAppPath(), "libraries", "java", "ForgeCLI.jar");
-      }
-    }
-    console.log(libPath, installerExec, workDir);
-    const child = childProcess.spawn(javaExecutable, [
-      "-jar",
-      libPath,
-      "--installer",
-      installerExec,
-      "--target",
-      workDir,
-    ]);
-    child.stdout.on("data", (data) => {
-      console.log("[ForgeCLI]", data.toString("utf8"));
-    });
-    child.stderr.on("data", (data) => {
-      console.log("[ForgeCLI]", data.toString("utf8"));
-    });
-    child.on("close", (code, signal) => {
-      console.log("[ForgeCLI]", "Exited with code", code);
-      if (code === 0) resolve();
-      else reject(`ForgeCUI exited with code ${code}`);
-    });
   });
+  // 除外された手動Modはリストから削除
+  for (let i = removeCandidate.length - 1; i >= 0; i--) mdls.splice(removeCandidate[i], 1);
+
+  // 手動候補のModは存在を確認し、手動Modリストに追加
+  const manualMods: Artifact[] = [];
+  for (const mdl of manualModsCandidate) {
+    const artifact = mdl.artifact;
+    if (!(await fs.pathExists(mdl.artifactPath))) {
+      manualMods.push(artifact);
+    }
+  }
+  return manualMods;
 }

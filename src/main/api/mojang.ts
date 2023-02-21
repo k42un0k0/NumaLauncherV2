@@ -66,7 +66,7 @@ interface VersionUrlResonse {
     releaseTime: string;
   }[];
 }
-export async function getVersionUrl(version: string) {
+export async function getVersionDataUrl(version: string) {
   const response = await axios.get<VersionUrlResonse>("https://launchermeta.mojang.com/mc/game/version_manifest.json");
   const v = response.data.versions.find((v) => {
     return v.id === version;

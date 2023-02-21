@@ -13,7 +13,7 @@ import { Module } from "./distribution/module";
 import { Required } from "./distribution/required";
 import { Server } from "./distribution/server";
 import { isAutoconnectBroken } from "./jvmArgBuilder/argBuilder113";
-import { validateRules } from "./jvmArgBuilder/helper";
+import { validateRules } from "./versionManifest/helper";
 
 import LoggerUtil from "./loggerutil";
 import { getJDKPath, mcVersionAtLeast, mojangFriendlyOS } from "./utils/util";
