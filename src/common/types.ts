@@ -52,6 +52,7 @@ export type Module = {
   };
 };
 export interface Server {
+  name: string;
   icon?: string;
   id: string;
   description: string;

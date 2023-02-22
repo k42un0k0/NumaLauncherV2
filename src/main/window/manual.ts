@@ -15,6 +15,7 @@ app.on("quit", () => {
 
 export function openManualWindow(artifacts: Artifact[]) {
   let manualWindowIndex = 0;
+  let downloadIndex = 0;
   const manualWindows = {} as any;
   for (const manual of artifacts) {
     const index = ++manualWindowIndex;
@@ -71,7 +72,7 @@ export function openManualWindow(artifacts: Artifact[]) {
       // 進捗を送信 (開始)
       win.webContents.send("download-start", {
         index: downloadIndex,
-        name: manual.manual.name,
+        name: manual.manual!.name,
         received: item.getReceivedBytes(),
         total: item.getTotalBytes(),
       });
@@ -80,7 +81,7 @@ export function openManualWindow(artifacts: Artifact[]) {
         if (win.isDestroyed()) return;
         win.webContents.send("download-progress", {
           index: downloadIndex,
-          name: manual.manual.name,
+          name: manual.manual!.name,
           received: item.getReceivedBytes(),
           total: item.getTotalBytes(),
         });
@@ -94,25 +95,25 @@ export function openManualWindow(artifacts: Artifact[]) {
           // 違うファイルをダウンロードしてしまった場合
           win.webContents.send("download-end", {
             index: downloadIndex,
-            name: manual.manual.name,
+            name: manual.manual!.name,
             state: "hash-failed",
           });
-        } else if (fsExtra.existsSync(manual.path)) {
+        } else if (fs.existsSync(manual.path!)) {
           // ファイルが既にあったら閉じる
           win.close();
         } else {
           // ファイルを正しい位置に移動
-          fsExtra.moveSync(item.getSavePath(), manual.path);
+          fs.moveSync(item.getSavePath(), manual.path!);
           // 完了を通知
           win.webContents.send("download-end", {
             index: downloadIndex,
-            name: manual.manual.name,
+            name: manual.manual!.name,
             state,
           });
         }
       });
     });
     // ダウンロードサイトを表示
-    win.loadURL(manual.manual.url);
+    win.loadURL(manual.manual?.url || "");
   }
 }

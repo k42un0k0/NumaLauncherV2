@@ -29,9 +29,12 @@ export const stateJotai = atom<ViewState>({
   },
 });
 
-export function useSelector<T extends (state: ViewState) => any>(selector: T): ReturnType<T> {
+export function useSelector<T>(...args: [(state: ViewState) => T]): T;
+export function useSelector<T, S>(...args: [(state: ViewState) => T, (state: T) => S]): S;
+export function useSelector<T, S, U>(...args: [(state: ViewState) => T, (state: T) => S, (state: S) => U]): U;
+export function useSelector<T>(...selectors: ((state: any) => any)[]): T {
   const state = useAtomValue(stateJotai);
-  return selector(state);
+  return selectors.reduce<any>((state, selector) => selector(state), state);
 }
 export function useDispatch() {
   const setState = useSetAtom(stateJotai);

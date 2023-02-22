@@ -4,12 +4,13 @@ import { ConfigManager } from "./config/configManager";
 import { runMinecraft } from "./runMinecraft";
 import { DistroManager } from "./distribution/distroManager";
 import { MSAWindowManager } from "./window/msaLogin";
-import { Module as ViewModule, ViewState } from "../common/types";
+import { Module as ViewModule, Server as VieweServer, ViewState } from "../common/types";
 import { actions, PayloadFromActionCreator } from "../common/actions";
 import fs from "fs-extra";
 import { Types } from "./distribution/constatnts";
 import { Module } from "./distribution/module";
 import path from "path";
+import { Server } from "./distribution/server";
 
 export function setListener() {
   windowListener();
@@ -53,23 +54,26 @@ function viewListener() {
       selectedServer: ConfigManager.INSTANCE.config.selectedServer,
     };
     const mods = (modules?.reduce(recursiveModule, modsInitial) || modsInitial) as ViewState["setting"]["mod"];
+    const serverToViewServer = (server: Server): VieweServer => {
+      return {
+        name: server.name,
+        icon: server.icon,
+        id: server.id,
+        description: server.description,
+        version: server.version,
+        minecraftVersion: server.minecraftVersion,
+        mainServer: server.mainServer,
+      };
+    };
+    const selectedServer = DistroManager.getDistribution()?.getServer(ConfigManager.INSTANCE.config.selectedServer);
     return {
       overlay: {
         selectedServer: ConfigManager.INSTANCE.config.selectedServer,
-        servers:
-          DistroManager.getDistribution()?.servers.map((server) => {
-            return {
-              icon: server.icon,
-              id: server.id,
-              description: server.description,
-              version: server.version,
-              minecraftVersion: server.minecraftVersion,
-              mainServer: server.mainServer,
-            };
-          }) || [],
+        servers: DistroManager.getDistribution()?.servers.map(serverToViewServer) || [],
       },
       landing: {
         account: ConfigManager.INSTANCE.config.accounts[ConfigManager.INSTANCE.config.selectedUUID],
+        server: selectedServer && serverToViewServer(selectedServer),
       },
       setting: {
         account: {

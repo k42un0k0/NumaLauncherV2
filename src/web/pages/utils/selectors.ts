@@ -10,6 +10,7 @@ export const selectors = {
 
 export const landingSelectors = {
   account: createSelector(selectors.landing, (state) => state.account),
+  server: createSelector(selectors.landing, (state) => state.server),
 };
 
 export const settingSelectors = {

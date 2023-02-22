@@ -5,10 +5,14 @@ import Menu from "./DashBoard/Menu";
 import { useSetAtom } from "jotai";
 import { overlaySelectServerJotai } from "../utils/overlaySelectServerJotai";
 import { useMainPreload } from "@/web/utils/preload";
+import { useSelector } from "../utils/stateJotai";
+import { landingSelectors } from "../utils/selectors";
 import { useState } from "react";
+import { serverSelectors } from "../utils/generalSelectors";
 
 export default function DashBoard() {
   const setOverlay = useSetAtom(overlaySelectServerJotai);
+  const server = useSelector(landingSelectors.server);
   const mainPreload = useMainPreload();
   const [persentage, setPersentage] = useState<string>();
   const [detail, setDetail] = useState<string>();
@@ -111,7 +115,7 @@ export default function DashBoard() {
               <div css={styles.divider}></div>
               <div>{detail}</div>
               <button onClick={() => setOverlay(true)} css={styles.server}>
-                <div>&#8226; Modパックが選択されていません</div>
+                <div>• {server ? serverSelectors.orderlessName(server) : "Modパックが選択されていません"}</div>
                 <div css={styles.minimumfont}>▲Modパック/バージョン選択</div>
               </button>
             </>
@@ -142,7 +146,7 @@ const styles = {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 100px;
+    padding: 0 100px 50px;
   `,
   game: css`
     display: flex;

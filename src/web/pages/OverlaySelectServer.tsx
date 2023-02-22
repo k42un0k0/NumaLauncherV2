@@ -5,11 +5,16 @@ import { css } from "@emotion/react";
 import { actions } from "../../common/actions";
 import { useDispatch, useSelector } from "./utils/stateJotai";
 import { overlaySelectors } from "./utils/selectors";
+import { useEffect, useState } from "react";
 
 export default function OverlaySelectServer() {
   const [overlaySelectServer, setOverlay] = useAtom(overlaySelectServerJotai);
   const servers = useSelector(overlaySelectors.servers);
   const selectedServer = useSelector(overlaySelectors.selectedServer);
+  const [selectedValue, setValue] = useState(selectedServer);
+  useEffect(() => {
+    setValue(selectedServer);
+  }, [selectedServer]);
   const dispatch = useDispatch();
   return (
     <Overlay in={overlaySelectServer}>
@@ -20,20 +25,33 @@ export default function OverlaySelectServer() {
             return (
               <button
                 key={server.id}
-                onClick={() => dispatch(actions.overlay.selectServer(server.id))}
-                css={[styles.button, selectedServer === server.id && styles.selectedServer]}
+                onClick={() => {
+                  setValue(server.id);
+                }}
+                css={[styles.button, selectedValue === server.id && styles.selectedServer]}
               >
                 <img src={server.icon} css={styles.serverIcon} />
-                <span>{server.id}</span>
-                <span dangerouslySetInnerHTML={{ __html: server.description }} />
                 <div>
-                  <div>{server.minecraftVersion}</div>
-                  <div>{server.version}</div>
+                  <div>
+                    <span>{server.id}</span>
+                    <span dangerouslySetInnerHTML={{ __html: server.description }} />
+                    <div></div>
+                    <div>{server.minecraftVersion}</div>
+                    <div>{server.version}</div>
+                  </div>
                 </div>
               </button>
             );
           })}
         </div>
+        <button
+          onClick={() => {
+            dispatch(actions.overlay.selectServer(selectedValue));
+            setOverlay(false);
+          }}
+        >
+          選択
+        </button>
         <button onClick={() => setOverlay(false)}>close</button>
       </div>
     </Overlay>
@@ -75,8 +93,9 @@ const styles = {
     border: 1px solid #fff;
     height: 50px;
     width: 50px;
+    flex-shrink: 0;
   `,
   selectedServer: css`
-    font-weight: bold;
+    opacity: 1;
   `,
 };
