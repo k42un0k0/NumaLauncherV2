@@ -1,36 +1,28 @@
 import path from "path";
 import { ConfigManager } from "../config/configManager";
+import { Types } from "../distribution/constatnts";
+import { Module } from "../distribution/module";
+import { Server } from "../distribution/server";
+import { mcVersionAtLeast, mojangFriendlyOS } from "../utils/util";
 import { ForgeData112 } from "../versionManifest/forgeData112";
 import { ForgeData113 } from "../versionManifest/forgeData113";
-import { mcVersionAtLeast, mojangFriendlyOS } from "../utils/util";
 import { VersionData112 } from "../versionManifest/versionData112";
 import { VersionData113 } from "../versionManifest/versionData113";
 import fs from "fs-extra";
 import AdmZip from "adm-zip";
-import { Module } from "../distribution/module";
-import { Server } from "../distribution/server";
-import { Types } from "../distribution/constatnts";
 import { validateRules } from "../versionManifest/helper";
-/**
- * Resolve the full classpath argument list for this process. This method will resolve all Mojang-declared
- * libraries as well as the libraries declared by the server. Since mods are permitted to declare libraries,
- * this method requires all enabled mods as an input
- *
- * @param {Array.<Object>} mods An array of enabled mods which will be launched with this process.
- * @param {string} tempNativePath The path to store the native libraries.
- * @returns {Array.<string>} An array containing the paths of each library required by this process.
- */
-export function classpathArg(
+export function classpathArgs(
   mods: Module[],
   tempNativePath: string,
   server: Server,
   versionData: VersionData112 | VersionData113,
   forgeData: ForgeData112 | ForgeData113,
+  commonDir: string,
   usingLiteLoader: boolean,
   llPath: string,
   libPath: string
-): string[] {
-  let cpArgs = [];
+) {
+  let cpArgs: string[] = [];
 
   // Add the version.jar to the classpath.
   // const version = this.versionData.id
@@ -40,50 +32,28 @@ export function classpathArg(
     // Add the version.jar to the classpath.
     // Must not be added to the classpath for Forge 1.17+.
     const version = versionData.id;
-    cpArgs.push(
-      ConfigManager.getLauncherSetting()
-        .getDataDirectory()
-        .common.versions.$join(version, version + ".jar")
-    );
+    cpArgs.push(path.join(commonDir, "versions", version, version + ".jar"));
   }
 
   if (usingLiteLoader) {
-    cpArgs.push(llPath);
+    cpArgs.push(llPath!);
   }
 
   // Resolve the Mojang declared libraries.
   const mojangLibs = _resolveMojangLibraries(tempNativePath, versionData, libPath);
 
   // Resolve the server declared libraries.
-  const servLibs = _resolveServerLibraries(
-    mods,
-    server.modules,
-    ConfigManager.getLauncherSetting().getDataDirectory().common.$path,
-    forgeData
-  );
+  const servLibs = _resolveServerLibraries(mods, server, forgeData);
 
   // Merge libraries, server libs with the same
   // maven identifier will override the mojang ones.
   // Ex. 1.7.10 forge overrides mojang's guava with newer version.
-  const finalLibs = [...mojangLibs, ...servLibs];
-  console.log("adsfasdfasdfa", mojangLibs);
-  console.log("we8ufewlfjlej;", servLibs);
-  cpArgs = cpArgs.concat(finalLibs);
+  const finalLibs = { ...mojangLibs, ...servLibs };
+  cpArgs = cpArgs.concat(Object.values(finalLibs));
 
   _processClassPathList(cpArgs);
 
   return cpArgs;
-}
-
-function _processClassPathList(list: string[]) {
-  const ext = ".jar";
-  const extLen = ext.length;
-  for (let i = 0; i < list.length; i++) {
-    const extIndex = list[i].indexOf(ext);
-    if (extIndex > -1 && extIndex !== list[i].length - extLen) {
-      list[i] = list[i].substring(0, extIndex + extLen);
-    }
-  }
 }
 /**
  * Resolve the libraries defined by Mojang's version data. This method will also extract
@@ -99,13 +69,12 @@ function _resolveMojangLibraries(
   versionData: VersionData112 | VersionData113,
   libPath: string
 ) {
-  const libs = [];
+  const libs = {};
 
   const libArr = versionData.libraries;
   fs.ensureDirSync(tempNativePath);
   for (let i = 0; i < libArr.length; i++) {
     const lib = libArr[i];
-    console.log(lib);
     // @ts-expect-error aaa
     if (validateRules(lib.rules, lib.natives)) {
       // @ts-expect-error aaa
@@ -114,14 +83,18 @@ function _resolveMojangLibraries(
         const artifact = dlInfo.artifact;
         const to = path.join(libPath, artifact.path);
         const versionIndependentId = lib.name.substring(0, lib.name.lastIndexOf(":"));
-        libs.push(to);
+        // @ts-expect-error aaa
+        libs[versionIndependentId] = to;
       } else {
         // Extract the native library.
         // @ts-expect-error aaa
         const exclusionArr = lib.extract != null ? lib.extract.exclude : ["META-INF/"];
         const artifact =
           // @ts-expect-error aaa
-          lib.downloads.classifiers[lib.natives[mojangFriendlyOS()]!.replace("${arch}", process.arch.replace("x", ""))];
+          lib.downloads.classifiers[
+            // @ts-expect-error aaa
+            lib.natives[mojangFriendlyOS()].replace("${arch}", process.arch.replace("x", ""))
+          ];
 
         // Location of native zip.
         const to = path.join(libPath, artifact.path);
@@ -136,8 +109,7 @@ function _resolveMojangLibraries(
           let shouldExclude = false;
 
           // Exclude noted files.
-          // @ts-expect-error aaa
-          exclusionArr.forEach(function (exclusion) {
+          exclusionArr.forEach(function (exclusion: any) {
             if (fileName.indexOf(exclusion) > -1) {
               shouldExclude = true;
             }
@@ -145,7 +117,11 @@ function _resolveMojangLibraries(
 
           // Extract the file.
           if (!shouldExclude) {
-            fs.writeFileSync(path.join(tempNativePath, fileName), zipEntries[i].getData());
+            fs.writeFile(path.join(tempNativePath, fileName), zipEntries[i].getData(), (err) => {
+              if (err) {
+                console.log("Error while extracting native library:", err);
+              }
+            });
           }
         }
       }
@@ -154,83 +130,76 @@ function _resolveMojangLibraries(
 
   return libs;
 }
-
-/**
- * Resolve the libraries declared by this server in order to add them to the classpath.
- * This method will also check each enabled mod for libraries, as mods are permitted to
- * declare libraries.
- *
- * @param {Array.<Object>} mods An array of enabled mods which will be launched with this process.
- * @returns {{[id: string]: string}} An object containing the paths of each library this server requires.
- */
-function _resolveServerLibraries(
-  mods: Module[],
-  modules: Module[],
-  commonDir: string,
-  forgeData: ForgeData113 | ForgeData112
-) {
+function _resolveModuleLibraries(mdl: Module) {
+  if (!mdl.subModules) {
+    return [];
+  }
   let libs: string[] = [];
+  for (const sm of mdl.subModules) {
+    if (sm.type === Types.Library) {
+      // TODO Add as file or something.
+      const x = sm.id;
+      console.log(x);
+      if (
+        x.includes(":universal") ||
+        x.includes(":slim") ||
+        x.includes(":extra") ||
+        x.includes(":srg") ||
+        x.includes(":client")
+      ) {
+        console.log("SKIPPING " + x);
+        continue;
+      }
+      libs.push(sm.artifactPath);
+    }
+    // If this module has submodules, we need to resolve the libraries for those.
+    // To avoid unnecessary recursive calls, base case is checked here.
+    if (mdl.subModules) {
+      const res: any[] = _resolveModuleLibraries(sm);
+      if (res.length > 0) {
+        libs = libs.concat(res);
+      }
+    }
+  }
+  return libs;
+}
+
+function _resolveServerLibraries(mods: Module[], server: Server, forgeData: ForgeData112 | ForgeData113) {
+  const mdls = server.modules;
+  let libs: Record<ObjectKey, any> = {};
 
   // Locate Forge/Libraries
-  libs = modules.reduce((acc, mdl) => {
+  for (const mdl of mdls) {
     const type = mdl.type;
     if (type === Types.ForgeHosted || type === Types.Library) {
-      libs.push(mdl.artifactPath);
+      libs[mdl.versionLessID] = mdl.artifactPath;
       if (mdl.subModules) {
         const res = _resolveModuleLibraries(mdl);
         if (res.length > 0) {
-          return acc.concat(res);
+          libs = { ...libs, ...res };
         }
       }
     } else if (type === Types.Forge) {
       // Forgeインストーラで生成されたライブラリを追加
-      const forgeLibs = forgeData.libraries.map((library) => {
-        return path.join(commonDir, "libraries", library.downloads.artifact.path);
-      });
-      return acc.concat(forgeLibs);
-    }
-    return acc;
-  }, libs);
-
-  //Check for any libraries in our mod list.
-  return mods.reduce((acc, mod) => {
-    if (mod.subModules != null) {
-      const res = _resolveModuleLibraries(mod);
-      if (res.length > 0) {
-        return acc.concat(res);
+      const forgeLibs = [];
+      for (const library of forgeData.libraries) {
+        forgeLibs.push(
+          ConfigManager.getLauncherSetting().getDataDirectory().common.libraries.$join(library.downloads.artifact.path)
+        );
       }
+      libs = { ...libs, ...forgeLibs };
     }
-    return acc;
-  }, libs);
+  }
+
+  return libs;
 }
-
-/**
- * Recursively resolve the path of each library required by this module.
- *
- * @param {Object} mdl A module object from the server distro index.
- * @returns {Array.<string>} An array containing the paths of each library this module requires.
- */
-function _resolveModuleLibraries(mdl: Module): string[] {
-  return (
-    mdl.subModules?.reduce<string[]>((acc, sm) => {
-      if (sm.type === Types.Library) {
-        // TODO Add as file or something.
-        const x = sm.id;
-        if (
-          x.includes(":universal") ||
-          x.includes(":slim") ||
-          x.includes(":extra") ||
-          x.includes(":srg") ||
-          x.includes(":client")
-        ) {
-          return acc;
-        }
-        acc = acc.concat(sm.artifactPath);
-      }
-      if (sm.subModules) {
-        acc = acc.concat(_resolveModuleLibraries(sm));
-      }
-      return acc;
-    }, []) || []
-  );
+function _processClassPathList(list: string[]) {
+  const ext = ".jar";
+  const extLen = ext.length;
+  for (let i = 0; i < list.length; i++) {
+    const extIndex = list[i].indexOf(ext);
+    if (extIndex > -1 && extIndex !== list[i].length - extLen) {
+      list[i] = list[i].substring(0, extIndex + extLen);
+    }
+  }
 }

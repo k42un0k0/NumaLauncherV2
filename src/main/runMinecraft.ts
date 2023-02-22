@@ -17,6 +17,7 @@ import { Required } from "./distribution/required";
 import { Module } from "./distribution/module";
 import { Artifact } from "./distribution/artifact";
 import { RendererChannel } from "./utils/channels";
+import { openManualWindow } from "./window/manual";
 
 export async function runMinecraft(event: IpcMainInvokeEvent) {
   const distribution = DistroManager.INSTANCE.data!;
@@ -29,7 +30,7 @@ export async function runMinecraft(event: IpcMainInvokeEvent) {
   const manualData = await loadManualData(server);
   if (manualData.length > 0) {
     event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "close", payload: manualData });
-
+    openManualWindow(manualData);
     return;
   }
   // サイズを図ってthis.forgeに入れる;
