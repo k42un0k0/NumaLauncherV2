@@ -62,7 +62,7 @@ export function validateDistribution(server: Server) {
 export async function validateLibraries(versionData: VersionData112 | VersionData113) {
   const assets: Asset[] = [];
   versionData.libraries.forEach((lib) => {
-    if (!("natives" in lib) || validateRules(lib.rules, lib.natives)) {
+    if (validateRules(lib)) {
       const artifact =
         !("natives" in lib) || lib.natives == null
           ? lib.downloads.artifact

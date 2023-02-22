@@ -69,32 +69,25 @@ function _resolveMojangLibraries(
   versionData: VersionData112 | VersionData113,
   libPath: string
 ) {
-  const libs = {};
+  const libs: Record<string, string> = {};
 
   const libArr = versionData.libraries;
   fs.ensureDirSync(tempNativePath);
   for (let i = 0; i < libArr.length; i++) {
     const lib = libArr[i];
-    // @ts-expect-error aaa
-    if (validateRules(lib.rules, lib.natives)) {
-      // @ts-expect-error aaa
-      if (lib.natives == null) {
+
+    if (validateRules(lib)) {
+      if (!("natives" in lib) || lib.natives == null) {
         const dlInfo = lib.downloads;
         const artifact = dlInfo.artifact;
         const to = path.join(libPath, artifact.path);
         const versionIndependentId = lib.name.substring(0, lib.name.lastIndexOf(":"));
-        // @ts-expect-error aaa
         libs[versionIndependentId] = to;
       } else {
         // Extract the native library.
-        // @ts-expect-error aaa
         const exclusionArr = lib.extract != null ? lib.extract.exclude : ["META-INF/"];
         const artifact =
-          // @ts-expect-error aaa
-          lib.downloads.classifiers[
-            // @ts-expect-error aaa
-            lib.natives[mojangFriendlyOS()].replace("${arch}", process.arch.replace("x", ""))
-          ];
+          lib.downloads.classifiers[lib.natives[mojangFriendlyOS()]!.replace("${arch}", process.arch.replace("x", ""))];
 
         // Location of native zip.
         const to = path.join(libPath, artifact.path);
