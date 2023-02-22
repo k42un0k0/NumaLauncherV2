@@ -1,6 +1,4 @@
 import { ipcRenderer } from "electron";
-import jQuery from "jquery";
-import Swal from "sweetalert2";
 import { Artifact } from "./distribution/artifact";
 
 // 最初に一回案内を表示するフラグ
@@ -12,7 +10,13 @@ ipcRenderer.on("manual-first", (event, arg) => {
 // 案内情報をメインプロセスから受け取る
 ipcRenderer.on("manual-data", (event, artifact: Artifact, manualWindowIndex: number) => {
   // jQueryを読み込み
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const jQuery = require("jquery");
+  //window.jQuery = jQuery
 
+  // アラート用のライブラリ
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const Swal = require("sweetalert2");
   // 荒らしにくくしたeval あくまでも気休め程度
   function scopeEval(scope: any, script: string) {
     return Function('"use strict";return (' + script + ")").bind(scope)();
@@ -67,7 +71,7 @@ ipcRenderer.on("manual-data", (event, artifact: Artifact, manualWindowIndex: num
         icon: "success",
         confirmButtonText: "ウィンドウを閉じる",
         allowOutsideClick: false,
-      }).then((result) => {
+      }).then(() => {
         // OK押したらウィンドウを閉じる
         ipcRenderer.send("closeManualWindow", manualWindowIndex);
       });
@@ -77,7 +81,7 @@ ipcRenderer.on("manual-data", (event, artifact: Artifact, manualWindowIndex: num
         title: "違うファイルをダウンロードしています",
         text: "手順をもう一度確認してください",
         icon: "error",
-      }).then((result) => {
+      }).then(() => {
         // リダイレクト阻止解除
         ipcRenderer.send("preventManualWindowRedirect", manualWindowIndex, false);
       });
@@ -87,7 +91,7 @@ ipcRenderer.on("manual-data", (event, artifact: Artifact, manualWindowIndex: num
         title: "ダウンロード失敗",
         text: "しばらく時間を置いてもう一度お試しください",
         icon: "error",
-      }).then((result) => {
+      }).then(() => {
         // リダイレクト阻止解除
         ipcRenderer.send("preventManualWindowRedirect", manualWindowIndex, false);
       });

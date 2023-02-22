@@ -18,44 +18,81 @@ import { Module } from "./distribution/module";
 import { Artifact } from "./distribution/artifact";
 import { RendererChannel } from "./utils/channels";
 import { openManualWindow } from "./window/manual";
+import { DiscordWrapper } from "./discord";
+import { optionscopy } from "./optionscopy";
 
 export async function runMinecraft(event: IpcMainInvokeEvent) {
-  const distribution = DistroManager.INSTANCE.data!;
-  const selectedServer = ConfigManager.INSTANCE.config.selectedServer;
-  const server = distribution.servers.find((server) => server.id == selectedServer) || distribution.servers[0];
-  if (!server) {
-    // サーバーが選択されてない時の処理
-    throw new Error("サーバーが選択されていません");
+  try {
+    const distribution = DistroManager.INSTANCE.data!;
+    const selectedServer = ConfigManager.INSTANCE.config.selectedServer;
+    const server = distribution.servers.find((server) => server.id == selectedServer) || distribution.servers[0];
+    if (!server) {
+      throw new Error("サーバーが選択されていません");
+    }
+    const manualData = await loadManualData(server);
+    if (manualData.length > 0) {
+      event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "close", payload: manualData });
+      openManualWindow(manualData);
+      return;
+    }
+    // サイズを図ってthis.forgeに入れる;
+    const [forge, extractQueue] = validateDistribution(server);
+    event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "distribution" });
+    const versionData = await loadVersionData(server.minecraftVersion);
+    event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "version" });
+    const assets = await validateAssets(versionData, event.sender);
+    event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "assets" });
+    const libraries = await validateLibraries(versionData);
+    event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "libraries" });
+    const files = await validateMiscellaneous(versionData);
+    event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "files" });
+    await processDLQueues(event.sender, [
+      { dltracker: forge, limit: 20 },
+      { dltracker: assets, limit: 20 },
+      { dltracker: libraries, limit: 5 },
+      { dltracker: files, limit: 5 },
+    ] as { dltracker: DLTracker; limit: number }[]);
+    event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "forge" });
+    const forgeData = await loadForgeData(server);
+    event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "complate", payload: "install" });
+    const authUser = ConfigManager.INSTANCE.getSelectedAccount();
+    event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validateEverything" });
+    const pb = new ProcessBuilder(server, versionData, forgeData, authUser, electron.app.getVersion());
+
+    const process = pb.build();
+    const instanceDir = ConfigManager.getLauncherSetting().getDataDirectory().instances;
+    if (
+      ConfigManager.getLauncherSetting().optionStandardize &&
+      !fs.existsSync(instanceDir.game(server.id).optionFile)
+    ) {
+      const instances = fs.readdirSync(instanceDir.$path);
+      //最新のoptions.txtを取得する
+      let maxMtime = 0;
+      let optionfilepath = "";
+      instances.forEach((instance) => {
+        const optionPath = instanceDir.game(instance).optionFile;
+
+        if (fs.existsSync(optionPath)) {
+          const stats = fs.statSync(optionPath);
+          if (stats.mtime.getTime() > maxMtime) {
+            maxMtime = stats.mtime.getTime();
+            optionfilepath = optionPath;
+          }
+        }
+      });
+
+      //コピー元ファイルが存在するときコピーを実行する
+      if (maxMtime != 0) {
+        console.log("options.txtコピー実行 コピー元:" + optionfilepath);
+        optionscopy(optionfilepath, instanceDir.game(server.id).optionFile);
+      }
+    }
+
+    event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "close" });
+  } catch (e) {
+    console.log(e);
+    event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "error", payload: e });
   }
-  const manualData = await loadManualData(server);
-  if (manualData.length > 0) {
-    event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "close", payload: manualData });
-    openManualWindow(manualData);
-    return;
-  }
-  // サイズを図ってthis.forgeに入れる;
-  const [forge, extractQueue] = validateDistribution(server);
-  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "distribution" });
-  const versionData = await loadVersionData(server.minecraftVersion);
-  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "version" });
-  const assets = await validateAssets(versionData, event.sender);
-  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "assets" });
-  const libraries = await validateLibraries(versionData);
-  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "libraries" });
-  const files = await validateMiscellaneous(versionData);
-  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "files" });
-  await processDLQueues(event.sender, [
-    { dltracker: forge, limit: 20 },
-    { dltracker: assets, limit: 20 },
-    { dltracker: libraries, limit: 5 },
-    { dltracker: files, limit: 5 },
-  ] as { dltracker: DLTracker; limit: number }[]);
-  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "validate", payload: "forge" });
-  const forgeData = await loadForgeData(server);
-  const authUser = ConfigManager.INSTANCE.getSelectedAccount();
-  const pb = new ProcessBuilder(server, versionData, forgeData, authUser, electron.app.getVersion());
-  pb.build();
-  event.sender.send(RendererChannel.ON_RUN_MINECRAFT, { type: "close" });
 }
 
 async function processDLQueues(sender: WebContents, dltrackerData: { dltracker: DLTracker; limit: number }[]) {

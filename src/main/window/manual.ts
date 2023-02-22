@@ -100,7 +100,7 @@ export function openManualWindow(artifacts: Artifact[]) {
           });
         } else if (fs.existsSync(manual.path!)) {
           // ファイルが既にあったら閉じる
-          win.close();
+          // win.close();
         } else {
           // ファイルを正しい位置に移動
           fs.moveSync(item.getSavePath(), manual.path!);

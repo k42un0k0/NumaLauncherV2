@@ -18,7 +18,6 @@ export default function DashBoard() {
   const [detail, setDetail] = useState<string>();
   const runMinecraft = () => {
     const cb = mainPreload.onRunMinecraft((type, payload) => {
-      console.log(type, payload);
       switch (type) {
         case "validate":
           switch (payload) {
@@ -64,9 +63,32 @@ export default function DashBoard() {
               throw new Error("not implemented");
           }
           break;
+        case "complete":
+          switch (payload) {
+            case "download":
+            case "install":
+              setDetail("起動の準備中..");
+              break;
+          }
+          break;
         case "close":
           if (payload != null) {
-            console.log("aaa");
+            setPersentage("");
+            setDetail("");
+            cb();
+            return;
+          }
+          setDetail("準備OK。参加勢集合！！！");
+          setPersentage("100");
+          setTimeout(() => {
+            setPersentage("");
+            setDetail("");
+          }, 10000);
+          cb();
+          break;
+        case "error":
+          if (payload instanceof Error) {
+            console.log(payload, payload.stack);
           }
           setPersentage("");
           setDetail("");

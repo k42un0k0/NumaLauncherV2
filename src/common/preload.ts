@@ -29,4 +29,6 @@ export type MainPreload = {
 type RunMinecraftListenr =
   | ((type: "validate", payload: "assets" | "libraries" | "files" | "version" | "distribution" | "forge") => void)
   | ((type: "progress", payload: { type: "assets" | "download"; progress: number; total: number }) => void)
-  | ((type: "close", payload: Artifact[] | undefined) => void);
+  | ((type: "complete", payload: "download" | "install") => void)
+  | ((type: "close", payload: Artifact[] | undefined) => void)
+  | ((type: "error", payload: any) => void);

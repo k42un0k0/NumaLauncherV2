@@ -27,6 +27,7 @@ export class LauncherSetting {
               forgeModListFile: "forgeMods.list",
               fmlFile: "forgeModList.json",
               llFile: "liteloaderModList.json",
+              optionFile: "options.txt",
             };
           },
         },

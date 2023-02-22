@@ -30,6 +30,7 @@ export class Module implements ModuleJson {
     this.artifactID = metaArr[1] || "???";
     this.artifactGroup = metaArr[0] || "???";
     this.artifactPath = this._resolveArtifactPath(serverID);
+    this.artifact.path = this.artifactPath;
     this.versionLessID = this.artifactGroup + ":" + this.artifactID;
   }
   getExtension() {
