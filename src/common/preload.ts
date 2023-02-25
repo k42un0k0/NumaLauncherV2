@@ -1,6 +1,6 @@
 import { Artifact } from "@/main/distribution/artifact";
 import { Action } from "./actions";
-import { CloseMsaLoginWindowState, OpenMsaLoginWindowState, ViewState } from "./types";
+import { CloseMsaLoginWindowState, OpenMsaLoginWindowState, RunMinecraftListenr, ViewState } from "./types";
 
 export type MainPreload = {
   window: {
@@ -25,10 +25,3 @@ export type MainPreload = {
   onCloseMSALoginWindow: (callback: (state: CloseMsaLoginWindowState) => void) => () => void;
   openServerDir: () => void;
 };
-
-type RunMinecraftListenr =
-  | ((type: "validate", payload: "assets" | "libraries" | "files" | "version" | "distribution" | "forge") => void)
-  | ((type: "progress", payload: { type: "assets" | "download"; progress: number; total: number }) => void)
-  | ((type: "complete", payload: "download" | "install") => void)
-  | ((type: "close", payload: Artifact[] | undefined) => void)
-  | ((type: "error", payload: any) => void);

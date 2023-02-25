@@ -57,6 +57,7 @@ export default function DashBoard() {
               break;
             }
             case "download":
+              console.log(payload.progress, payload.total);
               setPersentage(`${Math.floor((payload.progress / payload.total) * 100)}`);
               break;
             default:
@@ -186,6 +187,7 @@ const styles = {
   minimumfont: css`
     font-size: 10px;
     transform: scale(0.8);
+    text-align: center;
   `,
   server: css`
     font-size: 10px;

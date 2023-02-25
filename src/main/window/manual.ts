@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { BrowserWindow } from "electron";
 import path from "path";
 import fs from "fs-extra";
 import { Artifact } from "../distribution/artifact";
@@ -6,19 +6,18 @@ import { getPlatformIcon } from "@/assets/ts";
 import { SealCircleSet } from "@/assets/ts/main";
 import { paths } from "../utils/paths";
 import { validateLocal } from "../downloader/helper";
-const downloadDirectory = path.join(app.getPath("temp"), "NumaLauncher", "ManualDownloads");
+import { ManualRendererChannel } from "../utils/channels";
 
-app.on("quit", () => {
-  // tmpディレクトリお掃除
-  fs.removeSync(downloadDirectory);
-});
-
+export class ManualWindowManager {
+  private static instance?: ManualWindowManager;
+  static get INSTANCE() {
+    if (ManualWindowManager.instance != null) return ManualWindowManager.instance;
+    return (ManualWindowManager.instance = new ManualWindowManager());
+  }
+  manualWindows: ({ win: BrowserWindow; manual: Artifact; preventRedirect: boolean } | undefined)[] = [];
+}
 export function openManualWindow(artifacts: Artifact[]) {
-  let manualWindowIndex = 0;
-  let downloadIndex = 0;
-  const manualWindows = {} as any;
-  for (const manual of artifacts) {
-    const index = ++manualWindowIndex;
+  artifacts.forEach((manual, index) => {
     const win = new BrowserWindow({
       width: 1280,
       height: 720,
@@ -26,94 +25,48 @@ export function openManualWindow(artifacts: Artifact[]) {
       autoHideMenuBar: true,
       webPreferences: {
         preload: path.join(paths.manualPreloadFile),
+        partition: `manual-${index}`, // パーティションを分けることでウィンドウを超えてwill-downloadイベント同士が作用しあわない
       },
     });
-    manualWindows[index] = {
-      win,
-      manual,
-      preventRedirect: false,
-    };
-
-    // セキュリティポリシー無効化
-    win.webContents.session.webRequest.onHeadersReceived((d, c) => {
-      if (d.responseHeaders!["Content-Security-Policy"]) {
-        delete d.responseHeaders!["Content-Security-Policy"];
-      } else if (d.responseHeaders!["content-security-policy"]) {
-        delete d.responseHeaders!["content-security-policy"];
-      }
-
-      c({ cancel: false, responseHeaders: d.responseHeaders });
-    });
-
-    // ウィンドウ開いた直後(ページ遷移時を除く)のみ最初のダイアログ表示
-    win.webContents.send("manual-first");
-    // ロードが終わったら案内情報のデータをレンダープロセスに送る
     win.webContents.on("dom-ready", () => {
-      if (win.isDestroyed()) return;
-      win.webContents.send("manual-data", manual, index);
+      win.webContents.send(ManualRendererChannel.DATA, manual);
     });
-    // リダイレクトキャンセル
-    win.webContents.on("will-navigate", (event, args) => {
+    win.webContents.session.on("will-download", (_, item) => {
+      // なぜかisDestroyed==trueの状態で実行されることがある
       if (win.isDestroyed()) return;
-      const window = manualWindows[index];
-      if (window !== undefined) {
-        if (window.preventRedirect) event.preventDefault();
-      }
-    });
-    // ダウンロードされたらファイル名をすり替え、ハッシュチェックする
-    win.webContents.session.on("will-download", (event, item, webContents) => {
-      if (win.isDestroyed()) return;
-
-      downloadIndex++;
-
-      // 一時フォルダに保存
-      item.setSavePath(path.join(downloadDirectory, item.getFilename()));
-
-      // 進捗を送信 (開始)
-      win.webContents.send("download-start", {
-        index: downloadIndex,
+      item.setSavePath(paths.manualDownloads.$join(item.getFilename()));
+      win.webContents.send(ManualRendererChannel.download.START, {
         name: manual.manual!.name,
         received: item.getReceivedBytes(),
         total: item.getTotalBytes(),
       });
-      // 進捗を送信 (進行中)
-      item.on("updated", (event, state) => {
+      item.on("updated", () => {
         if (win.isDestroyed()) return;
-        win.webContents.send("download-progress", {
-          index: downloadIndex,
-          name: manual.manual!.name,
+        win.webContents.send(ManualRendererChannel.download.PROGRESS, {
           received: item.getReceivedBytes(),
           total: item.getTotalBytes(),
         });
       });
       // 進捗を送信 (完了)
-      item.once("done", (event, state) => {
+      item.once("done", (_, state) => {
         if (win.isDestroyed()) return;
         // ファイルが正しいかチェックする
         const v = item.getTotalBytes() === manual.size && validateLocal(item.getSavePath(), "md5", manual.MD5);
         if (!v) {
           // 違うファイルをダウンロードしてしまった場合
-          win.webContents.send("download-end", {
-            index: downloadIndex,
-            name: manual.manual!.name,
-            state: "hash-failed",
-          });
+          win.webContents.send(ManualRendererChannel.download.END, "hash-failed");
         } else if (fs.existsSync(manual.path!)) {
           // ファイルが既にあったら閉じる
-          // win.close();
+          win.close();
         } else {
           // ファイルを正しい位置に移動
           fs.moveSync(item.getSavePath(), manual.path!);
           // 完了を通知
-          win.webContents.send("download-end", {
-            index: downloadIndex,
-            name: manual.manual!.name,
-            state,
-          });
+          win.webContents.send(ManualRendererChannel.download.END, state);
         }
       });
     });
     // ダウンロードサイトを表示
     win.loadURL(manual.manual?.url || "");
-  }
+  });
 }

@@ -100,15 +100,18 @@ async function processDLQueues(sender: WebContents, dltrackerData: { dltracker: 
   let totalSize = 0;
   for (const item of dltrackerData) {
     totalSize += item.dltracker.dlsize;
+  }
+  for (const item of dltrackerData) {
     await forEachOfLimit(item.dltracker.dlqueue, item.limit, async (asset) => {
       fs.ensureDirSync(path.join(asset.to, ".."));
       const response = await fetch(asset.from);
       const size = Number(response.headers.get("content-length"));
       if (asset.size != size) {
-        totalSize = -asset.size + size;
+        totalSize += -asset.size + size;
       }
       const writeStream = fs.createWriteStream(asset.to);
       response.body?.pipe(writeStream);
+
       response.body?.on("data", (chunk) => {
         progress += chunk.length;
         sender.send(RendererChannel.ON_RUN_MINECRAFT, {

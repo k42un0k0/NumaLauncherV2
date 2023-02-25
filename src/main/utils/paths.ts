@@ -91,7 +91,7 @@ function getLauncherSkinPath() {
   }
 }
 
-export const sysRoot =
+const sysRoot =
   process.env.APPDATA ||
   (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support" : (process.env.HOME as string));
 
@@ -111,11 +111,13 @@ export const paths = genPaths(
       originSkinOldFile: "launcher_skins.json",
       skinSettingFile: "skinSetting.json",
     },
+    manualDownloads: {},
   },
   {
     root: __dirname,
     sysRoot: sysRoot,
     launcher: process.env.CONFIG_DIRECT_PATH || electron.app.getPath("userData"),
     minecraftLauncherData: getLauncherSkinPath(),
+    manualDownloads: path.join(app.getPath("temp"), "NumaLauncher", "ManualDownloads"),
   }
 );

@@ -1,3 +1,4 @@
+import { Artifact } from "@/main/distribution/artifact";
 import { AuthAccount } from "../main/config/msAccount";
 
 export type OpenMsaLoginWindowState = "success" | "already";
@@ -60,3 +61,9 @@ export interface Server {
   minecraftVersion: string;
   mainServer: boolean;
 }
+export type RunMinecraftListenr =
+  | ((type: "validate", payload: "assets" | "libraries" | "files" | "version" | "distribution" | "forge") => void)
+  | ((type: "progress", payload: { type: "assets" | "download"; progress: number; total: number }) => void)
+  | ((type: "complete", payload: "download" | "install") => void)
+  | ((type: "close", payload: Artifact[] | undefined) => void)
+  | ((type: "error", payload: any) => void);

@@ -1,14 +1,12 @@
 import { ipcRenderer } from "electron";
 import { Artifact } from "./distribution/artifact";
+import { ManualRendererChannel } from "./utils/channels";
 
-// 最初に一回案内を表示するフラグ
-let isFirst = false;
-ipcRenderer.on("manual-first", (event, arg) => {
-  isFirst = true;
+let artifact: Artifact | undefined;
+ipcRenderer.on(ManualRendererChannel.DATA, (_, artifactProp: Artifact) => {
+  artifact = artifactProp;
 });
-
-// 案内情報をメインプロセスから受け取る
-ipcRenderer.on("manual-data", (event, artifact: Artifact, manualWindowIndex: number) => {
+window.addEventListener("load", () => {
   // jQueryを読み込み
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const jQuery = require("jquery");
@@ -17,7 +15,53 @@ ipcRenderer.on("manual-data", (event, artifact: Artifact, manualWindowIndex: num
   // アラート用のライブラリ
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const Swal = require("sweetalert2");
-  // 荒らしにくくしたeval あくまでも気休め程度
+  let swalContainer: HTMLElement | undefined;
+  ipcRenderer.on(ManualRendererChannel.download.START, (_, data) => {
+    Swal.fire({
+      title: "ダウンロード中",
+      html: `${data.name}<p>${(data.received / 1024).toFixed()} / ${(data.total / 1024).toFixed()} KB</p>`,
+      allowOutsideClick: false,
+      showCancelButton: false,
+      showConfirmButton: false,
+    });
+    swalContainer = Swal.getHtmlContainer().querySelector("p");
+  });
+  ipcRenderer.on(ManualRendererChannel.download.PROGRESS, (_, data) => {
+    swalContainer!.innerText = `${(data.received / 1024).toFixed()} / ${(data.total / 1024).toFixed()} KB`;
+  });
+  ipcRenderer.on(ManualRendererChannel.download.END, (event, state) => {
+    if (state === "completed") {
+      // 正常終了
+      Swal.fire({
+        title: "ダウンロード完了",
+        text: "お疲れさまでした",
+        icon: "success",
+        confirmButtonText: "ウィンドウを閉じる",
+        allowOutsideClick: false,
+      }).then(() => {
+        window.close();
+      });
+    } else if (state === "hash-failed") {
+      // ハッシュ値が違う場合
+      Swal.fire({
+        title: "違うファイルをダウンロードしています",
+        text: "手順をもう一度確認してください",
+        icon: "error",
+      }).then(() => {
+        window.close();
+      });
+    } else {
+      // 失敗
+      Swal.fire({
+        title: "ダウンロード失敗",
+        text: "しばらく時間を置いてもう一度お試しください",
+        icon: "error",
+      }).then(() => {
+        window.close();
+      });
+    }
+  });
+
   function scopeEval(scope: any, script: string) {
     return Function('"use strict";return (' + script + ")").bind(scope)();
   }
@@ -38,66 +82,6 @@ ipcRenderer.on("manual-data", (event, artifact: Artifact, manualWindowIndex: num
       html: `<p>動画の手順に従ってダウンロードしてください</p><iframe width="450" height="256" src="https://www.youtube.com/embed/${id}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`,
     });
   }
-
-  // ダウンロード情報を管理 (複数同時にダウンロードされることはないだろうが、念の為対応)
-  const manualDownloads: { name: string; container: HTMLElement }[] = [];
-  ipcRenderer.on("download-start", (event, data) => {
-    // リダイレクト阻止
-    ipcRenderer.send("preventManualWindowRedirect", manualWindowIndex, true);
-    // 進捗を表示。ただしSwalは同時に2つダイアログをだすことはできない
-    Swal.fire({
-      title: "ダウンロード中",
-      html: `${data.name}<p>${(data.received / 1024).toFixed()} / ${(data.total / 1024).toFixed()} KB</p>`,
-      allowOutsideClick: false,
-      showCancelButton: false,
-      showConfirmButton: false,
-    });
-    manualDownloads[data.index] = {
-      name: data.name,
-      container: Swal.getHtmlContainer()!.querySelector("p")!,
-    };
-  });
-  ipcRenderer.on("download-progress", (event, data) => {
-    manualDownloads[data.index].container!.innerText = `${(data.received / 1024).toFixed()} / ${(
-      data.total / 1024
-    ).toFixed()} KB`;
-  });
-  ipcRenderer.on("download-end", (event, data) => {
-    if (data.state === "completed") {
-      // 正常終了
-      Swal.fire({
-        title: "ダウンロード完了",
-        text: "お疲れさまでした",
-        icon: "success",
-        confirmButtonText: "ウィンドウを閉じる",
-        allowOutsideClick: false,
-      }).then(() => {
-        // OK押したらウィンドウを閉じる
-        ipcRenderer.send("closeManualWindow", manualWindowIndex);
-      });
-    } else if (data.state === "hash-failed") {
-      // ハッシュ値が違う場合
-      Swal.fire({
-        title: "違うファイルをダウンロードしています",
-        text: "手順をもう一度確認してください",
-        icon: "error",
-      }).then(() => {
-        // リダイレクト阻止解除
-        ipcRenderer.send("preventManualWindowRedirect", manualWindowIndex, false);
-      });
-    } else {
-      // 失敗
-      Swal.fire({
-        title: "ダウンロード失敗",
-        text: "しばらく時間を置いてもう一度お試しください",
-        icon: "error",
-      }).then(() => {
-        // リダイレクト阻止解除
-        ipcRenderer.send("preventManualWindowRedirect", manualWindowIndex, false);
-      });
-    }
-  });
-
   // CSS
   let hintCss = `
         .swal2-container {
@@ -182,9 +166,9 @@ ipcRenderer.on("manual-data", (event, artifact: Artifact, manualWindowIndex: num
     `;
 
   // ヒントを表示
-  if (artifact.manual?.hints !== undefined) {
+  if (artifact?.manual?.hints !== undefined) {
     const showHints = () => {
-      artifact.manual?.hints?.forEach((hint, hintIndex) => {
+      artifact!.manual!.hints!.forEach((hint, hintIndex) => {
         (hint.script ? scopeEval({ jQuery }, hint.script) : jQuery(hint.css))
           .addClass("manual-info-circle")
           .addClass("manual-info-hint")
@@ -192,14 +176,6 @@ ipcRenderer.on("manual-data", (event, artifact: Artifact, manualWindowIndex: num
       });
     };
 
-    // 意地でもヒントを表示させる
-    if (document.readyState === "loading") {
-      // Loading hasn't finished yet
-      document.addEventListener("DOMContentLoaded", showHints);
-    } else {
-      // `DOMContentLoaded` has already fired
-      showHints();
-    }
     setInterval(showHints, 1000);
 
     // CSSを追加
@@ -226,7 +202,7 @@ ipcRenderer.on("manual-data", (event, artifact: Artifact, manualWindowIndex: num
     });
 
   // 案内を表示
-  if (artifact.manual?.video !== undefined) {
+  if (artifact?.manual?.video !== undefined) {
     jQuery("<div>")
       .addClass("manual-info-button-help")
       .addClass("manual-info-button")
@@ -234,11 +210,9 @@ ipcRenderer.on("manual-data", (event, artifact: Artifact, manualWindowIndex: num
       .text("もう一度やり方を見る")
       .appendTo(jQuery("body"))
       .on("click", () => {
-        openYouTube(artifact.manual!.video!);
+        openYouTube(artifact!.manual!.video!);
       });
 
-    if (isFirst) {
-      openYouTube(artifact.manual.video);
-    }
+    openYouTube(artifact.manual.video);
   }
 });

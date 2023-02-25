@@ -3,6 +3,8 @@ import { config } from "dotenv";
 import axios from "axios";
 import { mainWindowBuilder } from "./window/main";
 import { setListener } from "./listener";
+import { paths } from "./utils/paths";
+import fs from "fs-extra";
 function bootstrap() {
   config();
   axios.interceptors.response.use(
@@ -26,6 +28,10 @@ function main() {
     mainWindow.loadFile("build/index.html");
   });
   app.once("window-all-closed", () => app.quit());
+  app.on("quit", () => {
+    // tmpディレクトリお掃除
+    fs.removeSync(paths.manualDownloads.$path);
+  });
   setListener();
 }
 

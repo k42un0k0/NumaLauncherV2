@@ -105,7 +105,7 @@ export class ModSetting {
   }
   constructor(public id: string, public mods: Record<string, ModSettingValue>) {}
   isModEnabled(versionLessID: string, defaultValue: boolean): boolean {
-    const mod = this.mods[versionLessID];
+    const mod = this.findMod(versionLessID);
     if (mod == null) {
       return defaultValue;
     }
@@ -116,6 +116,17 @@ export class ModSetting {
       return mod.value;
     }
     return true;
+  }
+  findMod(versionLessID: string) {
+    function scanMod(mods: Record<string, ModSettingValue>) {
+      return Object.keys(mods).reduce((acc, key): ModSettingValue | undefined => {
+        const mod = mods[key];
+        if (key === versionLessID) return mod;
+        if (typeof mod !== "boolean") return scanMod(mod.mods);
+        return acc;
+      }, undefined as ModSettingValue | undefined);
+    }
+    return scanMod(this.mods);
   }
 }
 
