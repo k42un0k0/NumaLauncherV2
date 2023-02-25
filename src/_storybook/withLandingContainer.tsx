@@ -1,6 +1,4 @@
 import Frame from "@/web/pages/components/Frame";
-import Container from "@/web/pages/Setting/Container";
-import Menu from "@/web/pages/Setting/Menu";
 import { css } from "@emotion/react";
 import bg from "../assets/images/backgrounds/1.jpg";
 
