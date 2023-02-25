@@ -7,8 +7,8 @@ import { serverSelectors } from "../../utils/generalSelectors";
 import { overlaySelectServerJotai } from "../../utils/overlaySelectServerJotai";
 import { landingSelectors } from "../../utils/selectors";
 import { useSelector } from "../../utils/stateJotai";
-import Menu from "./Menu";
-import Statuses from "./Statuses";
+import Menu from "./components/Menu";
+import Statuses from "./components/Statuses";
 
 export default function DashBoard() {
   const setOverlay = useSetAtom(overlaySelectServerJotai);

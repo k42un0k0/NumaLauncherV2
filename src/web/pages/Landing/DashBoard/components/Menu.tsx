@@ -1,10 +1,10 @@
 import { mainPreload } from "@/web/utils/preload";
 import { css } from "@emotion/react";
-import Gear from "../../components/Icon/Gear";
-import Tooltip from "../../components/Tooltip";
-import { usePageMove } from "../../utils/pageJotai";
-import { landingSelectors } from "../../utils/selectors";
-import { useSelector } from "../../utils/stateJotai";
+import Gear from "../../../components/Icon/Gear";
+import Tooltip from "./Tooltip";
+import { usePageMove } from "../../../utils/pageJotai";
+import { landingSelectors } from "../../../utils/selectors";
+import { useSelector } from "../../../utils/stateJotai";
 import Profile from "./Profile";
 
 export default function Menu() {

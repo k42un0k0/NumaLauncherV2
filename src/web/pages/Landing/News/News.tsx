@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 import { ChangeEvent, Fragment, useState } from "react";
 import { TransitionGroup } from "react-transition-group";
 import Fade from "../../components/Fade";
-import Radio from "../../components/Radio";
+import Radio from "../components/Radio";
 import CloseButton from "../components/CloseButton";
 
 type Props = {

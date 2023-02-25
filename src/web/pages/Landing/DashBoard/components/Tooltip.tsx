@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import { cloneElement, ReactElement, ReactNode, useEffect, useRef, useState } from "react";
 import { TransitionGroup } from "react-transition-group";
-import Fade from "./Fade";
+import Fade from "@/web/pages/components/Fade";
 
 type Props = { children: ReactElement; tooltip: ReactNode };
 

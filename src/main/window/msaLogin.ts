@@ -36,7 +36,6 @@ export class MSAWindowManager {
       broadcast(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, this._closeMSALoginWindowState());
       this._clear();
     });
-
     win.webContents.on("did-navigate", async (_, uri) => {
       if (uri.startsWith(redirectUriPrefix)) {
         const queryMap = redirectUriToQuery(uri);

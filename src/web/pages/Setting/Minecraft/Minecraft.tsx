@@ -1,6 +1,8 @@
 import { css } from "@emotion/react";
 import { settingSelectors } from "../../utils/selectors";
 import { useSelector } from "../../utils/stateJotai";
+import Switch from "../components/Switch";
+import TextInput from "../components/TextInput";
 
 export default function Account() {
   const minecraft = useSelector(settingSelectors.minecraft);
@@ -10,56 +12,53 @@ export default function Account() {
         <span>Minecraft設定</span>
         <span>ゲームの起動に関連するオプション</span>
       </div>
-      <div>
-        <span>ゲーム解像度</span>
-        <div>
-          <input type="number" min="0" defaultValue={minecraft.resWidth} />
-          <div>&#10006;</div>
-          <input type="number" min="0" defaultValue={minecraft.resHeight} />
+      <div css={styles.resolutionContainer}>
+        <div css={styles.fieldTitle}>ゲーム解像度</div>
+        <div css={styles.resolution}>
+          <TextInput css={styles.resolutionInput} type="number" min="0" defaultValue={minecraft.resWidth} />
+          <div css={styles.resolutionCross}>&#10006;</div>
+          <TextInput css={styles.resolutionInput} type="number" min="0" defaultValue={minecraft.resHeight} />
         </div>
       </div>
-      <div>
-        <div>
-          <span>フルスクリーン起動</span>
-        </div>
+      <div css={styles.fieldContainer}>
+        <div css={styles.fieldTitle}>フルスクリーン起動</div>
         <div>
           <label>
-            <input type="checkbox" defaultChecked={minecraft.fullscreen} />
+            <Switch value={minecraft.fullscreen} />
             <span></span>
           </label>
         </div>
       </div>
-      <div>
-        <div>
-          <span>起動時に自動的にサーバーに接続する</span>
-        </div>
+      <div css={styles.fieldContainer}>
+        <div css={styles.fieldTitle}>起動時に自動的にサーバーに接続する</div>
         <div>
           <label>
-            <input type="checkbox" defaultChecked={minecraft.fullscreen} />
+            <Switch value={minecraft.fullscreen} />
             <span></span>
           </label>
         </div>
       </div>
-      <div>
+      <div css={styles.fieldContainer}>
         <div>
-          <span>ランチャーとゲームを分離する</span>
-          <span>オンにするとランチャーを終了するとゲームも終了します</span>
+          <div css={styles.fieldTitle}>ランチャーとゲームを分離する</div>
+          <div css={styles.fieldDescription}>オンにするとランチャーを終了するとゲームも終了します</div>
         </div>
         <div>
           <label>
-            <input type="checkbox" defaultValue={minecraft.optionStandize + ""} />
-            <span></span>
+            <Switch value={minecraft.optionStandize} />
           </label>
         </div>
       </div>
-      <div>
+      <div css={styles.fieldContainer}>
         <div>
-          <span>設定を共有する</span>
-          <span>modパックの初回起動時に、最後に設定を変更したmodパックからMinecraftの設定をコピーします。</span>
+          <div css={styles.fieldTitle}>設定を共有する</div>
+          <div css={styles.fieldDescription}>
+            modパックの初回起動時に、最後に設定を変更したmodパックからMinecraftの設定をコピーします。
+          </div>
         </div>
         <div>
           <label>
-            <input type="checkbox" defaultChecked={minecraft.optionStandize} />
+            <Switch value={minecraft.optionStandize} />
             <span></span>
           </label>
         </div>
@@ -70,5 +69,53 @@ export default function Account() {
 const styles = {
   root: css`
     flex: 1;
+    padding-right: 25%;
+  `,
+  fieldTitle: css`
+    font-size: 14px;
+    font-family: "Avenir Medium";
+    color: rgba(255, 255, 255, 0.95);
+  `,
+  fieldDescription: css`
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.95);
+    margin-top: 5px;
+  `,
+  fieldContainer: css`
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  `,
+  resolutionContainer: css`
+    padding: 20px 0px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  `,
+  resolution: css`
+    display: flex;
+    align-items: center;
+    padding-top: 10px;
+  `,
+  resolutionInput: css`
+    padding: 7.5px 5px;
+    width: 75px;
+    :focus {
+      outline: none;
+    }
+    /* Chrome, Safari, Edge, Opera */
+    ::-webkit-outer-spin-button,
+    ::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* Firefox */
+    [type="number"] {
+      -moz-appearance: textfield;
+    }
+  `,
+  resolutionCross: css`
+    color: grey;
+    padding: 0px 15px;
   `,
 };

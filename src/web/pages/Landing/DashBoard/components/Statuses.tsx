@@ -2,7 +2,7 @@ import { statusToHex, statuses } from "@/web/utils/api/mojang";
 import { css } from "@emotion/react";
 import { Fragment, useState } from "react";
 import { TransitionGroup } from "react-transition-group";
-import Fade from "../../components/Fade";
+import Fade from "../../../components/Fade";
 
 export default function Statuses() {
   const essential = statuses.filter((status) => status.essential);

@@ -18,7 +18,7 @@ const styles = {
     height: calc(100vh - 24px);
     background-color: rgba(0, 0, 0, 0.5);
     display: flex;
-    padding: 40px 0;
+    padding-top: 40px;
   `,
   pageContainer: css`
     height: 100%;
