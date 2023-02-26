@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import { ReactNode, useRef } from "react";
 
-type Props = { children: ReactNode };
+type Props = { children: ReactNode; onChange: (files: FileList) => void };
 export default function Dnd({ children }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   return (

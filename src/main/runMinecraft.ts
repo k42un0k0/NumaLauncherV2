@@ -176,7 +176,7 @@ async function loadManualData(server: Server) {
   const manualMods: Artifact[] = [];
   for (const mdl of manualModsCandidate) {
     const artifact = mdl.artifact;
-    if (!(await fs.pathExists(mdl.artifactPath))) {
+    if (!(await fs.pathExists(mdl.artifact.path))) {
       manualMods.push(artifact);
     }
   }

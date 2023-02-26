@@ -55,12 +55,12 @@ export function openManualWindow(artifacts: Artifact[]) {
         if (!v) {
           // 違うファイルをダウンロードしてしまった場合
           win.webContents.send(ManualRendererChannel.download.END, "hash-failed");
-        } else if (fs.existsSync(manual.path!)) {
+        } else if (fs.existsSync(manual.path)) {
           // ファイルが既にあったら閉じる
           win.close();
         } else {
           // ファイルを正しい位置に移動
-          fs.moveSync(item.getSavePath(), manual.path!);
+          fs.moveSync(item.getSavePath(), manual.path);
           // 完了を通知
           win.webContents.send(ManualRendererChannel.download.END, state);
         }

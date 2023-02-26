@@ -1,16 +1,28 @@
 import { css } from "@emotion/react";
-import { useState } from "react";
+import { ChangeEvent, useState, useEffect } from "react";
 
 type Props = {
-  value: boolean;
-  onChange: (value: boolean) => void;
+  value?: boolean;
+  defaultValue?: boolean;
+  onChange?: (e: ChangeEvent) => void;
 };
-export default function Switch({ value, onChange }: Props) {
+export default function Switch({ value, defaultValue, onChange }: Props) {
+  const [checkedState, setCheckedState] = useState(defaultValue != null ? defaultValue : value);
+  useEffect(() => {
+    setCheckedState(value);
+  }, [value]);
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newChecked = event.target.checked;
+    setCheckedState(newChecked);
+    if (onChange) {
+      onChange(event);
+    }
+  };
+  const checked = value != null ? value : checkedState;
   return (
-    <div css={[styles.background, value && styles.backgroundActive]} onClick={() => onChange(!value)}>
-      <div css={[styles.switch, value && styles.switchActive]}>
-        <input type="checkbox" css={styles.input} checked={value} />
-      </div>
+    <div css={[styles.background, checked && styles.backgroundActive]}>
+      <div css={[styles.switch, checked && styles.switchActive]}></div>
+      <input type="checkbox" css={styles.input} checked={checked} onChange={handleInputChange} />
     </div>
   );
 }
@@ -45,9 +57,15 @@ const styles = {
     transform: translateX(15px);
   `,
   input: css`
+    cursor: inherit;
+    position: absolute;
+    opacity: 0;
     width: 100%;
     height: 100%;
-    clip: rect(0, 0, 0, 0);
-    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    zindex: 1;
   `,
 };

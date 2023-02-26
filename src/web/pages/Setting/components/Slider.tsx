@@ -17,7 +17,7 @@ export default function Slider({ defaultValue, max, min, step = 1 }: Props) {
       const leftDiff = e.pageX - rootRef.current!.offsetLeft;
       const rightDiff = e.pageX - rootRef.current!.offsetLeft - rootRef.current!.offsetWidth;
       const diff =
-        ((e.pageX - rootRef.current!.offsetLeft - thumbRef.current!.offsetLeft + 10) / rootRef.current!.offsetWidth) *
+        ((e.pageX - rootRef.current!.offsetLeft - thumbRef.current!.offsetLeft - 10) / rootRef.current!.offsetWidth) *
         100;
       if (rightDiff > 0) {
         setValue(max);

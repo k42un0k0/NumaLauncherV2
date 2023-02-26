@@ -32,7 +32,7 @@ export async function loadForgeData(server: Server): Promise<ForgeData112 | Forg
         }
 
         await _installForgeWithCLI(
-          ob.artifactPath,
+          ob.artifact.path,
           ConfigManager.getLauncherSetting().getDataDirectory().common.$path,
           getJDKPath()
         );
@@ -47,13 +47,13 @@ export async function loadForgeData(server: Server): Promise<ForgeData112 | Forg
         // Read Manifest
         for (const sub of ob.subModules || []) {
           if (sub.type === Types.VersionManifest) {
-            return JSON.parse(fs.readFileSync(sub.artifactPath, "utf-8"));
+            return JSON.parse(fs.readFileSync(sub.artifact.path, "utf-8"));
           }
         }
         throw "No forge version manifest found!";
       } else {
         const obArtifact = ob.artifact;
-        const obPath = ob.artifactPath;
+        const obPath = ob.artifact.path;
         const asset = new Asset(ob.id, obArtifact.MD5, obArtifact.size, obArtifact.url, obPath);
         const forgeData = await unzipForgeVersionData(asset);
         return forgeData;

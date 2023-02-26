@@ -143,7 +143,7 @@ function _resolveModuleLibraries(mdl: Module) {
         console.log("SKIPPING " + x);
         continue;
       }
-      libs.push(sm.artifactPath);
+      libs.push(sm.artifact.path);
     }
     // If this module has submodules, we need to resolve the libraries for those.
     // To avoid unnecessary recursive calls, base case is checked here.
@@ -165,7 +165,7 @@ function _resolveServerLibraries(mods: Module[], server: Server, forgeData: Forg
   for (const mdl of mdls) {
     const type = mdl.type;
     if (type === Types.ForgeHosted || type === Types.Library) {
-      libs[mdl.versionLessID] = mdl.artifactPath;
+      libs[mdl.versionLessID] = mdl.artifact.path;
       if (mdl.subModules) {
         const res = _resolveModuleLibraries(mdl);
         if (res.length > 0) {

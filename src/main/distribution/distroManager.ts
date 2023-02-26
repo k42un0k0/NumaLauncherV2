@@ -49,15 +49,18 @@ export class DistroManager {
     return DistroManager.INSTANCE.data;
   }
   static jsonToDistroIndex(dist: DistroJson): DistroIndex {
-    function createModules(modules: ModuleJson[], serverid: string): Module[] {
+    function createModules(modules: ModuleJson[], serverId: string): Module[] {
       return modules.map((module) => {
-        const required: Required = new Required(module.required?.value, module.required?.def);
+        const required = new Required(module.required?.value, module.required?.def);
         const artifact = new Artifact(
           module.artifact.size,
           module.artifact.MD5,
           module.artifact.url,
           module.artifact.manual,
-          module.artifact.path
+          module.artifact.path,
+          module.id,
+          module.type,
+          serverId
         );
         return new Module(
           module.id,
@@ -65,8 +68,7 @@ export class DistroManager {
           module.type,
           required,
           artifact,
-          serverid,
-          module.subModules && createModules(module.subModules, serverid)
+          module.subModules && createModules(module.subModules, serverId)
         );
       });
     }

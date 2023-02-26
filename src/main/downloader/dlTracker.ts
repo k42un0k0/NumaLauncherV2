@@ -35,7 +35,7 @@ export class DLTracker {
     let dlsize = 0;
     modules.forEach((module) => {
       const artifact = module.artifact;
-      const artifactPath = module.artifactPath;
+      const artifactPath = artifact.path;
       const asset = new Asset(module.id, artifact.MD5, artifact.size, artifact.url, artifactPath);
       const validationPath = artifactPath.toLowerCase().endsWith(".pack.xz")
         ? artifactPath.substring(0, artifactPath.toLowerCase().lastIndexOf(".pack.xz"))

@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
-import { ReactNode, useRef } from "react";
+import { ChangeEvent, ReactNode, useRef } from "react";
 
-type Props = { children: ReactNode };
+type Props = { children: ReactNode; onChange: (e: ChangeEvent) => void };
 export default function FileInput({ children }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   return (

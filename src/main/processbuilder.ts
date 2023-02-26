@@ -194,15 +194,15 @@ export class ProcessBuilder {
         if (!ll.required.value) {
           const modCfg = ConfigManager.getModsSetting(this.server.id);
           if (modCfg && modCfg.isModEnabled(ll.versionLessID, ll.required.def)) {
-            if (fs.existsSync(ll.artifactPath)) {
+            if (fs.existsSync(ll.artifact.path)) {
               this.usingLiteLoader = true;
-              this.llPath = ll.artifactPath;
+              this.llPath = ll.artifact.path;
             }
           }
         } else {
-          if (fs.existsSync(ll.artifactPath)) {
+          if (fs.existsSync(ll.artifact.path)) {
             this.usingLiteLoader = true;
-            this.llPath = ll.artifactPath;
+            this.llPath = ll.artifact.path;
           }
         }
       }

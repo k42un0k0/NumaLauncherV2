@@ -1,15 +1,13 @@
 import { isWin } from "@/web/utils/utils";
 import { settingSelectors } from "../../utils/selectors";
 import { useSelector } from "../../utils/stateJotai";
+import Head from "../components/Head";
 
 export default function Account() {
   const java = useSelector(settingSelectors.java);
   return (
     <div>
-      <div>
-        <span>Java設定</span>
-        <span>Javaの詳細設定</span>
-      </div>
+      <Head head="Java設定" description="Javaの詳細設定" />
       <div>
         <div>メモリ割り当て</div>
         <div>

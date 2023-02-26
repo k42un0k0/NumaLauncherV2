@@ -1,14 +1,13 @@
 import { settingSelectors } from "../../utils/selectors";
 import { useSelector } from "../../utils/stateJotai";
+import Head from "../components/Head";
+import Switch from "../components/Switch";
 
 export default function Launcher() {
   const launcher = useSelector(settingSelectors.launcher);
   return (
     <div>
-      <div>
-        <span>ランチャー設定</span>
-        <span>沼ランチャー本体の設定です</span>
-      </div>
+      <Head head="ランチャー設定" description="沼ランチャー本体の設定です" />
       <div>
         <div>
           <span>プレリリース版へ更新</span>
@@ -18,12 +17,7 @@ export default function Launcher() {
             オフにしておくことを推奨します
           </span>
         </div>
-        <div>
-          <label>
-            <input type="checkbox" defaultChecked={launcher.allowPrerelease} />
-            <span></span>
-          </label>
-        </div>
+        <Switch defaultValue={launcher.allowPrerelease} />
       </div>
       <div>
         <div>

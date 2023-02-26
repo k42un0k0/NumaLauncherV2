@@ -15,6 +15,7 @@ import OverlaySelectServer from "./OverlaySelectServer";
 import { stateJotai } from "./utils/stateJotai";
 import { landingSelectors } from "./utils/selectors";
 import { overlaySelectServerJotai } from "./utils/overlaySelectServerJotai";
+import { usePrepareReleaseNoteJotai } from "./utils/releaseJotai";
 
 export const Main = () => {
   const setState = useSetAtom(stateJotai);
@@ -34,6 +35,7 @@ export const Main = () => {
     }
     effect();
   }, []);
+  usePrepareReleaseNoteJotai();
   const [page] = useAtom(pageJotai);
   const overlay = useAtomValue(overlaySelectServerJotai);
   return (

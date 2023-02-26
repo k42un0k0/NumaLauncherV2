@@ -1,6 +1,7 @@
 import { css } from "@emotion/react";
 import { settingSelectors } from "../../utils/selectors";
 import { useSelector } from "../../utils/stateJotai";
+import Head from "../components/Head";
 import Switch from "../components/Switch";
 import TextInput from "../components/TextInput";
 
@@ -8,10 +9,7 @@ export default function Account() {
   const minecraft = useSelector(settingSelectors.minecraft);
   return (
     <div css={styles.root}>
-      <div>
-        <span>Minecraft設定</span>
-        <span>ゲームの起動に関連するオプション</span>
-      </div>
+      <Head head="Minecraft設定" description="ゲームの起動に関連するオプション" />
       <div css={styles.resolutionContainer}>
         <div css={styles.fieldTitle}>ゲーム解像度</div>
         <div css={styles.resolution}>
