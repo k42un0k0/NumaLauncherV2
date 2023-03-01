@@ -4,6 +4,7 @@ import { ViewState } from "@/common/types";
 import { mainPreload } from "@/web/utils/preload";
 
 export const stateJotai = atom<ViewState>({
+  firstLaunch: false,
   overlay: { servers: [], selectedServer: "" },
   landing: { account: undefined },
   setting: {

@@ -16,6 +16,7 @@ import { stateJotai } from "./utils/stateJotai";
 import { landingSelectors } from "./utils/selectors";
 import { overlaySelectServerJotai } from "./utils/overlaySelectServerJotai";
 import { usePrepareReleaseNoteJotai } from "./utils/releaseJotai";
+import FirstLaunch from "./FirstLaunch/FIrstLaunch";
 
 export const Main = () => {
   const setState = useSetAtom(stateJotai);
@@ -27,6 +28,10 @@ export const Main = () => {
       await mainPreload.distribution.load();
       const state = await mainPreload.view.getState();
       setState(state);
+      if (state.firstLaunch) {
+        pageMove.firstLaunch();
+        return;
+      }
       if (landingSelectors.account(state)) {
         pageMove.home();
         return;
@@ -58,6 +63,12 @@ function mainComp(page: PageJotai) {
       return (
         <Fade key="splash">
           <Splash />
+        </Fade>
+      );
+    case "firstLaunch":
+      return (
+        <Fade key="home">
+          <FirstLaunch />
         </Fade>
       );
     case "home":

@@ -6,6 +6,8 @@ import { setListener } from "./listener";
 import { paths } from "./utils/paths";
 import fs from "fs-extra";
 import { isMac } from "./utils/util";
+import { ConfigManager } from "./config/configManager";
+import { DistroManager } from "./distribution/distroManager";
 function bootstrap() {
   config();
   axios.interceptors.response.use(
@@ -96,7 +98,7 @@ function createMenu() {
 }
 
 function main() {
-  app.whenReady().then(() => {
+  app.whenReady().then(async () => {
     bootstrap();
     if (isMac) {
       createMenu();

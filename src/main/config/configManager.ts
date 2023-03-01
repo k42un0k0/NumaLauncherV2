@@ -16,9 +16,11 @@ export class ConfigManager {
     }
     return ConfigManager.instance;
   }
+  firstLoad: boolean;
   config: Config;
   constructor() {
     this.config = Config.default();
+    this.firstLoad = true;
   }
   static getLauncherSetting() {
     return ConfigManager.INSTANCE.config.setting.launcher;
@@ -66,7 +68,7 @@ export class ConfigManager {
       args: configArgs,
     };
     this.config = mergeNonNullishValue(this.config, plainToClass(def, config));
-
+    this.firstLoad = false;
     this.save();
   }
 }

@@ -11,7 +11,7 @@ export default {
   component: Dnd,
 };
 
-const Template = (_: ComponentProps<typeof Dnd>) => <Dnd>こんにちは</Dnd>;
+const Template = (props: ComponentProps<typeof Dnd>) => <Dnd {...props}>こんにちは</Dnd>;
 
 export const Primary: ComponentStory<typeof Dnd> = Template.bind({});
 Primary.args = {};

@@ -11,7 +11,7 @@ export default {
   component: FileInput,
 };
 
-const Template = (_: ComponentProps<typeof FileInput>) => <FileInput>ファイルを選択</FileInput>;
+const Template = (props: ComponentProps<typeof FileInput>) => <FileInput {...props}>ファイルを選択</FileInput>;
 
 export const Primary: ComponentStory<typeof FileInput> = Template.bind({});
 Primary.args = {};

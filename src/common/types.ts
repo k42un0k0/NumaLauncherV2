@@ -5,6 +5,7 @@ export type OpenMsaLoginWindowState = "success" | "already";
 export type CloseMsaLoginWindowState = "success" | "failure";
 
 export type ViewState = {
+  firstLaunch: boolean;
   overlay: {
     selectedServer: string;
     servers: Server[];

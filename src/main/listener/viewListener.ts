@@ -24,6 +24,7 @@ export function viewListener() {
 
     const selectedServer = DistroManager.getDistribution()?.getServer(ConfigManager.INSTANCE.config.selectedServer);
     return {
+      firstLaunch: ConfigManager.INSTANCE.firstLoad,
       overlay: {
         selectedServer: ConfigManager.INSTANCE.config.selectedServer,
         servers: DistroManager.getDistribution()?.servers.map(serverToViewServer) || [],
