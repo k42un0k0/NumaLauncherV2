@@ -25,12 +25,12 @@ export function viewListener() {
     const selectedServer = DistroManager.getDistribution()?.getServer(ConfigManager.INSTANCE.config.selectedServer);
     return {
       firstLaunch: ConfigManager.INSTANCE.firstLoad,
+      account: ConfigManager.INSTANCE.config.accounts[ConfigManager.INSTANCE.config.selectedUUID],
       overlay: {
         selectedServer: ConfigManager.INSTANCE.config.selectedServer,
         servers: DistroManager.getDistribution()?.servers.map(serverToViewServer) || [],
       },
       landing: {
-        account: ConfigManager.INSTANCE.config.accounts[ConfigManager.INSTANCE.config.selectedUUID],
         server: selectedServer && serverToViewServer(selectedServer),
       },
       setting: {

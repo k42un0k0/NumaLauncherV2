@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { MainPreload } from "../common/preload";
-import { CloseMsaLoginWindowState } from "../common/types";
+import { CloseMsaLoginWindowState, LoginMSAState } from "../common/types";
 import { MainChannel, RendererChannel } from "./utils/channels";
 
 const preload: MainPreload = {
@@ -17,6 +17,11 @@ const preload: MainPreload = {
   },
   view: {
     getState: () => ipcRenderer.invoke(MainChannel.state.GET_STATE),
+    setState: (setState) => {
+      const cb = () => setState();
+      ipcRenderer.on(RendererChannel.state.SET_STATE, cb);
+      return () => ipcRenderer.off(RendererChannel.state.SET_STATE, cb);
+    },
     dispatch: (action) => ipcRenderer.invoke(MainChannel.state.DISPATCH, action),
   },
   config: {
@@ -29,6 +34,10 @@ const preload: MainPreload = {
   onCloseMSALoginWindow: (callback) => {
     ipcRenderer.on(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, (_, state: CloseMsaLoginWindowState) => callback(state));
     return () => ipcRenderer.off(RendererChannel.CLOSE_MSA_LOGIN_WINDOW, callback);
+  },
+  onLoginMsa: (callback) => {
+    ipcRenderer.on(RendererChannel.LOGIN_MSA, (_, state: LoginMSAState) => callback(state));
+    return () => ipcRenderer.off(RendererChannel.LOGIN_MSA, callback);
   },
   runMinecraft: () => ipcRenderer.invoke(MainChannel.RUN_MINECRAFT),
   importOfficialSkinInfo: () => ipcRenderer.invoke(MainChannel.IMPORT_OFFICIAL_SKIN_INFO),

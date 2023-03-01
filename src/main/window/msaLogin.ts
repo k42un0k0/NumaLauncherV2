@@ -45,10 +45,14 @@ export class MSAWindowManager {
           return;
         }
         this._successLogin();
-
         win.close();
-        const authAcount = await fetchMSAccount(authCode);
-        ConfigManager.INSTANCE.createAccount(authAcount);
+        try {
+          const authAcount = await fetchMSAccount(authCode);
+          ConfigManager.INSTANCE.createAccount(authAcount);
+          broadcast(RendererChannel.LOGIN_MSA, "success");
+        } catch (_) {
+          broadcast(RendererChannel.LOGIN_MSA, "falure");
+        }
       }
     });
     return win;

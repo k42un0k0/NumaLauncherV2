@@ -1,8 +1,14 @@
-import { Artifact } from "@/main/distribution/artifact";
 import { Action } from "./actions";
-import { CloseMsaLoginWindowState, OpenMsaLoginWindowState, RunMinecraftListenr, ViewState } from "./types";
+import {
+  CloseMsaLoginWindowState,
+  LoginMSAState,
+  OpenMsaLoginWindowState,
+  RunMinecraftListenr,
+  ViewState,
+} from "./types";
 
 export type MainPreload = {
+  onLoginMsa(callback: (state: LoginMSAState) => void): () => void;
   window: {
     close: () => void;
     minimize: () => void;
@@ -10,6 +16,7 @@ export type MainPreload = {
   };
   view: {
     getState(): Promise<ViewState>;
+    setState(setState: () => void): () => void;
     dispatch(action: Action<unknown>): Promise<void>;
   };
   config: {

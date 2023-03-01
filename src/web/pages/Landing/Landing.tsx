@@ -5,13 +5,13 @@ import DashBoard from "./DashBoard";
 import EditSkin from "./EditSkin";
 import News from "./News";
 import Skin from "./Skin";
-import { landingSelectors } from "../utils/selectors";
+import { selectors } from "../utils/selectors";
 import { useSelector } from "../utils/stateJotai";
 
 export default function Home() {
   const [active, setSkinActive] = useState(false);
   const [open, setOpen] = useState(true);
-  const account = useSelector(landingSelectors.account);
+  const account = useSelector(selectors.account);
   const [currentSkin, setCurrentSkin] = useState<{ skinURL: string; model: "default" | "slim" | undefined }>({
     skinURL: "",
     model: undefined,

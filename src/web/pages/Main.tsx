@@ -13,7 +13,6 @@ import { backgroundImages } from "../../assets/ts/web";
 import Splash from "./Splash";
 import OverlaySelectServer from "./OverlaySelectServer";
 import { stateJotai } from "./utils/stateJotai";
-import { landingSelectors } from "./utils/selectors";
 import { overlaySelectServerJotai } from "./utils/overlaySelectServerJotai";
 import { usePrepareReleaseNoteJotai } from "./utils/releaseJotai";
 import FirstLaunch from "./FirstLaunch/FIrstLaunch";
@@ -27,12 +26,16 @@ export const Main = () => {
       await mainPreload.config.load();
       await mainPreload.distribution.load();
       const state = await mainPreload.view.getState();
+      mainPreload.view.setState(async () => {
+        console.log("set state");
+        setState(await mainPreload.view.getState());
+      });
       setState(state);
       if (state.firstLaunch) {
         pageMove.firstLaunch();
         return;
       }
-      if (landingSelectors.account(state)) {
+      if (state.account) {
         pageMove.home();
         return;
       }

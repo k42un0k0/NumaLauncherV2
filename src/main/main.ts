@@ -6,8 +6,6 @@ import { setListener } from "./listener";
 import { paths } from "./utils/paths";
 import fs from "fs-extra";
 import { isMac } from "./utils/util";
-import { ConfigManager } from "./config/configManager";
-import { DistroManager } from "./distribution/distroManager";
 function bootstrap() {
   config();
   axios.interceptors.response.use(
@@ -53,6 +51,16 @@ function createMenu() {
       },
     ],
   };
+  // Extend default included application menu to continue support for quit keyboard shortcut
+  const windowMenu: MenuItemConstructorOptions = {
+    label: "Window",
+    submenu: [
+      {
+        role: "reload",
+        accelerator: "CmdOrCtrl+R",
+      },
+    ],
+  };
 
   // New edit menu adds support for text-editing keyboard shortcuts
   const editSubMenu: MenuItemConstructorOptions = {
@@ -93,7 +101,7 @@ function createMenu() {
       },
     ],
   };
-  const menuObject = Menu.buildFromTemplate([applicationSubMenu, editSubMenu]);
+  const menuObject = Menu.buildFromTemplate([applicationSubMenu, editSubMenu, windowMenu]);
   Menu.setApplicationMenu(menuObject);
 }
 
@@ -110,6 +118,7 @@ function main() {
 
     mainWindow.loadFile("build/index.html");
   });
+
   app.once("window-all-closed", () => app.quit());
   app.on("quit", () => {
     // tmpディレクトリお掃除

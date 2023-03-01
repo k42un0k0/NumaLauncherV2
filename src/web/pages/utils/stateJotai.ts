@@ -5,8 +5,9 @@ import { mainPreload } from "@/web/utils/preload";
 
 export const stateJotai = atom<ViewState>({
   firstLaunch: false,
+  account: undefined,
   overlay: { servers: [], selectedServer: "" },
-  landing: { account: undefined },
+  landing: {},
   setting: {
     account: { accounts: {}, selectedUUID: "" },
     minecraft: {

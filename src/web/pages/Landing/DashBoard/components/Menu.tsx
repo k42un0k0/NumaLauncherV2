@@ -3,13 +3,13 @@ import { css } from "@emotion/react";
 import Gear from "../../../components/Icon/Gear";
 import Tooltip from "./Tooltip";
 import { usePageMove } from "../../../utils/pageJotai";
-import { landingSelectors } from "../../../utils/selectors";
+import { selectors } from "../../../utils/selectors";
 import { useSelector } from "../../../utils/stateJotai";
 import Profile from "./Profile";
 
 export default function Menu() {
   const pageMove = usePageMove();
-  const account = useSelector(landingSelectors.account);
+  const account = useSelector(selectors.account);
   return (
     <div css={styles.container}>
       <div css={styles.prifile}>

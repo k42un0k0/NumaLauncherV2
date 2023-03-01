@@ -4,6 +4,8 @@ import { paths } from "../utils/paths";
 import { Config, configArgs } from "./config";
 import { mergeNonNullishValue, plainToClass } from "../utils/object";
 import { ConfigJSON } from "./json";
+import { broadcast } from "../utils/util";
+import { RendererChannel } from "../utils/channels";
 
 export class ConfigManager {
   static getTempNativeFolder(): string {
@@ -45,6 +47,7 @@ export class ConfigManager {
   }
   save() {
     fs.writeFileSync(paths.launcher.configFile, JSON.stringify(this.config, null, 4), "utf-8");
+    broadcast(RendererChannel.state.SET_STATE);
   }
 
   load() {

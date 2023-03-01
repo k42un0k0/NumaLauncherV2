@@ -29,7 +29,11 @@ export const MainChannel = {
 
 export const RendererChannel = {
   CLOSE_MSA_LOGIN_WINDOW: "CLOSE_MSA_LOGIN_WINDOW",
+  LOGIN_MSA: "LOGIN_MSA",
   ON_RUN_MINECRAFT: "ON_RUN_MINECRAFT",
+  state: {
+    SET_STATE: "STATE/SET_STATE",
+  },
 };
 
 export const ManualRendererChannel = {

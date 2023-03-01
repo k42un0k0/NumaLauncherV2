@@ -3,15 +3,16 @@ import { AuthAccount } from "../main/config/msAccount";
 
 export type OpenMsaLoginWindowState = "success" | "already";
 export type CloseMsaLoginWindowState = "success" | "failure";
+export type LoginMSAState = "success" | "failure";
 
 export type ViewState = {
   firstLaunch: boolean;
+  account?: AuthAccount;
   overlay: {
     selectedServer: string;
     servers: Server[];
   };
   landing: {
-    account?: AuthAccount;
     server?: Server;
   };
   setting: {
