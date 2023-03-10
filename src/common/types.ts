@@ -1,5 +1,5 @@
-import { Artifact } from "@/main/distribution/artifact";
-import { AuthAccount } from "../main/config/msAccount";
+import { Artifact } from "@/main/entities/distribution/artifact";
+import { AuthAccount } from "../main/entities/config/msAccount";
 
 export type OpenMsaLoginWindowState = "success" | "already";
 export type CloseMsaLoginWindowState = "success" | "failure";

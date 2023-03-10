@@ -1,11 +1,12 @@
 import { app, BrowserWindow, dialog, globalShortcut, Menu, MenuItemConstructorOptions } from "electron";
 import { config } from "dotenv";
 import axios from "axios";
-import { mainWindowBuilder } from "./window/main";
-import { setListener } from "./listener";
+import { mainWindowBuilder } from "./usecases/mainWindow";
+import { setListener } from "./adapters";
 import { paths } from "./utils/paths";
 import fs from "fs-extra";
 import { isMac } from "./utils/util";
+import { createDependencies } from "./dependencies";
 function bootstrap() {
   config();
   axios.interceptors.response.use(
@@ -124,7 +125,8 @@ function main() {
     // tmpディレクトリお掃除
     fs.removeSync(paths.manualDownloads.$path);
   });
-  setListener();
+  const deps = createDependencies();
+  setListener(deps);
 }
 
 main();

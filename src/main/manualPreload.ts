@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron";
-import { Artifact } from "./distribution/artifact";
+import { Artifact } from "./entities/distribution/artifact";
 import { ManualRendererChannel } from "./utils/channels";
 
 let artifact: Artifact | undefined;

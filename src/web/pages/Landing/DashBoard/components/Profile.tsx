@@ -1,5 +1,5 @@
 import { css } from "@emotion/react";
-import { AuthAccount } from "../../../../../main/config/msAccount";
+import { AuthAccount } from "../../../../../main/entities/config/msAccount";
 import { usePageMove } from "../../../utils/pageJotai";
 
 type Props = {

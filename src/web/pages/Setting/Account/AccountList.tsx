@@ -1,4 +1,4 @@
-import { AuthAccount } from "../../../../main/config/msAccount";
+import { AuthAccount } from "../../../../main/entities/config/msAccount";
 import AccountItem from "./AccountItem";
 
 type Props = {

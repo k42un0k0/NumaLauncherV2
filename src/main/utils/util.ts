@@ -1,10 +1,10 @@
 import path from "path";
-import { ConfigManager } from "../config/configManager";
 import os from "os";
-import { DistroManager } from "../distribution/distroManager";
-import { ForgeData112 } from "../versionManifest/forgeData112";
-import { ForgeData113 } from "../versionManifest/forgeData113";
+import { DistroManager } from "../drivers/distroManager";
+import { ForgeData112 } from "../entities/versionManifest/forgeData112";
+import { ForgeData113 } from "../entities/versionManifest/forgeData113";
 import { app, BrowserWindow } from "electron";
+import { ConfigManager } from "../drivers/configManager";
 export function mojangFriendlyOS() {
   if (isMac) {
     return "osx";
