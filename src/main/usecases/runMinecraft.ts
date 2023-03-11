@@ -1,7 +1,6 @@
 import path from "path";
 import fs from "fs-extra";
-import fetch from "node-fetch";
-import { forEachOfLimit, mojangFriendlyOS } from "../utils/util";
+import { mojangFriendlyOS } from "../utils/util";
 import electron from "electron";
 import { ProcessBuilder } from "../drivers/processbuilder";
 import { AssetList } from "../entities/downloader/assetList";
@@ -11,7 +10,6 @@ import { ModSettingValue } from "../entities/config/modSetting";
 import { Required } from "../entities/distribution/required";
 import { Module } from "../entities/distribution/module";
 import { Artifact } from "../entities/distribution/artifact";
-import { openManualWindow } from "./manualWindow";
 import { optionscopy } from "../drivers/optionscopy";
 import { VersionData112 } from "../entities/versionManifest/versionData112";
 import { VersionData113 } from "../entities/versionManifest/versionData113";
@@ -28,6 +26,11 @@ export interface RunMinecraftOB {
   downloadProgress(total: number, progress: number): void;
   close(manualData?: Artifact[]): void;
   error(e: unknown): void;
+  createManualWindows(artifacts: Artifact[]): void;
+  processDLQueues(
+    assetListData: { assetList: AssetList; limit: number }[],
+    onData: (total: number, progress: number) => void
+  ): Promise<void>;
 }
 
 export class RunMinecraftInteractor {
@@ -48,7 +51,7 @@ export class RunMinecraftInteractor {
       const manualData = await this.loadManualData(server);
       if (manualData.length > 0) {
         output.close(manualData);
-        openManualWindow(manualData);
+        output.createManualWindows(manualData);
         return;
       }
       // サイズを図ってthis.forgeに入れる;
@@ -62,12 +65,15 @@ export class RunMinecraftInteractor {
       output.validate("libraries");
       const files = await this.validateMiscellaneous(versionData);
       output.validate("files");
-      await this.processDLQueues(output, [
-        { assetList: forge, limit: 20 },
-        { assetList: assets, limit: 20 },
-        { assetList: libraries, limit: 5 },
-        { assetList: files, limit: 5 },
-      ]);
+      await output.processDLQueues(
+        [
+          { assetList: forge, limit: 20 },
+          { assetList: assets, limit: 20 },
+          { assetList: libraries, limit: 5 },
+          { assetList: files, limit: 5 },
+        ],
+        (total, progress) => output.downloadProgress(total, progress)
+      );
       output.validate("forge");
       const forgeData = await this.forgeRepository.loadForgeData(server);
       output.complate("install");
@@ -107,34 +113,6 @@ export class RunMinecraftInteractor {
     } catch (e) {
       console.log(e);
       output.error(e);
-    }
-  }
-
-  async processDLQueues(output: RunMinecraftOB, assetListData: { assetList: AssetList; limit: number }[]) {
-    let progress = 0;
-    let totalSize = 0;
-    for (const item of assetListData) {
-      totalSize += item.assetList.dlsize;
-    }
-    for (const item of assetListData) {
-      await forEachOfLimit(item.assetList.dlqueue, item.limit, async (asset) => {
-        fs.ensureDirSync(path.join(asset.to, ".."));
-        const response = await fetch(asset.from);
-        const size = Number(response.headers.get("content-length"));
-        if (asset.size != size) {
-          totalSize += -asset.size + size;
-        }
-        const writeStream = fs.createWriteStream(asset.to);
-        response.body?.pipe(writeStream);
-
-        response.body?.on("data", (chunk) => {
-          progress += chunk.length;
-          output.downloadProgress(totalSize, progress);
-        });
-        return new Promise((resolve) => {
-          response.body?.on("close", () => resolve());
-        });
-      });
     }
   }
 

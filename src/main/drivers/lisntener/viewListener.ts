@@ -1,12 +1,12 @@
 import { ipcMain } from "electron";
-import { handleActions, MainChannel } from "../utils/channels";
-import { Module as ViewModule, Server as VieweServer, ViewState } from "../../common/types";
-import { actions, PayloadFromActionCreator } from "../../common/actions";
-import { Types } from "../entities/distribution/constatnts";
-import { Module } from "../entities/distribution/module";
-import { Server } from "../entities/distribution/server";
-import { ModSetting } from "../entities/config/modSetting";
-import { Dependencies } from "../dependencies";
+import { handleActions, MainChannel } from "../../utils/channels";
+import { Module as ViewModule, Server as VieweServer, ViewState } from "../../../common/types";
+import { actions, PayloadFromActionCreator } from "../../../common/actions";
+import { Types } from "../../entities/distribution/constatnts";
+import { Module } from "../../entities/distribution/module";
+import { Server } from "../../entities/distribution/server";
+import { ModSetting } from "../../entities/config/modSetting";
+import { Dependencies } from "../../dependencies";
 
 export function viewListener(deps: Dependencies) {
   ipcMain.handle(MainChannel.state.GET_STATE, function (): ViewState {

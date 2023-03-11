@@ -1,11 +1,8 @@
 import { BrowserWindow, BrowserWindowConstructorOptions } from "electron";
 import { getPlatformIcon } from "@/assets/ts";
 import { SealCircleSet } from "@/assets/ts/main";
-import { paths } from "../utils/paths";
 import { shell } from "electron";
-interface WindowBuilder {
-  (options: BrowserWindowConstructorOptions): BrowserWindow;
-}
+import { paths } from "@/main/utils/paths";
 
 const defaultOptions = {
   width: 980,
@@ -17,7 +14,7 @@ const defaultOptions = {
   frame: false,
   backgroundColor: "#171614",
 };
-export const mainWindowBuilder: WindowBuilder = (options: BrowserWindowConstructorOptions) => {
+export function createMainWindow(options: BrowserWindowConstructorOptions) {
   const win = new BrowserWindow({
     ...defaultOptions,
     ...options,
@@ -35,4 +32,4 @@ export const mainWindowBuilder: WindowBuilder = (options: BrowserWindowConstruct
     return { action: "deny" };
   });
   return win;
-};
+}

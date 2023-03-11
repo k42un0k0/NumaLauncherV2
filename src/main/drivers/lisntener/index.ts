@@ -1,13 +1,15 @@
 import { BrowserWindow, ipcMain, shell } from "electron";
-import { MainChannel } from "../utils/channels";
-import { DistroManager } from "../drivers/distroManager";
+import { MainChannel } from "../../utils/channels";
+import { DistroManager } from "../distroManager";
 import fs from "fs-extra";
 import { viewListener } from "./viewListener";
-import { ConfigManager } from "../drivers/configManager";
-import { ManualWindowManager } from "../usecases/manualWindow";
-import { MSAWindowManager } from "../usecases/msaLoginWindow";
-import { Dependencies } from "../dependencies";
-import { RunMinecraftPresenter } from "./RunMinecraftPresenter";
+import { ConfigManager } from "../configManager";
+import { ManualWindowManager } from "../../usecases/manualWindow";
+import { MSAWindowManager } from "../../usecases/msaLogin";
+import { Dependencies } from "../../dependencies";
+import { RunMinecraftPresenter } from "../../adapters/RunMinecraftPresenter";
+import { RunMinecraftViewImple } from "../viewImple/runMinecraftViewImple";
+import { MsaLoginViewImple } from "../viewImple/msaLoginViewImple";
 
 export function setListener(deps: Dependencies) {
   windowListener();
@@ -21,7 +23,7 @@ export function setListener(deps: Dependencies) {
 
 function globalListener(deps: Dependencies) {
   ipcMain.handle(MainChannel.RUN_MINECRAFT, function (event) {
-    return deps.runMinecraftInteractor.handle(new RunMinecraftPresenter(event.sender));
+    return deps.runMinecraftInteractor.handle(new RunMinecraftPresenter(new RunMinecraftViewImple(event.sender)));
   });
   ipcMain.on(MainChannel.IMPORT_OFFICIAL_SKIN_INFO, function (event) {
     throw new Error("not implemented");
@@ -46,14 +48,9 @@ function configListener() {
   });
 }
 
-function msaWindowListener() {
+function msaWindowListener(deps: Dependencies) {
   ipcMain.handle(MainChannel.OPEN_MSA_LOGIN_WINDOW, () => {
-    const windowManager = MSAWindowManager.INSTANCE;
-    if (windowManager.hasWindowInstance()) {
-      return "already";
-    }
-    windowManager.createWindow();
-    return "success";
+    return deps.msaLoginInteractor.handle(new MsaLoginViewImple());
   });
 }
 
